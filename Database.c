@@ -28,6 +28,20 @@ int database_init(struct database *db, char *server, char *user, char *password,
 }
 
 
+int database_addTestData(struct database *db){
+    
+    if(mysql_select_db(db->con, db->db_name)){
+
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+        return EXIT_FAILURE;
+    }
+
+
+    return EXIT_SUCCESS;
+
+}
+
+
 int database_generate(struct database *db){
 
     char *almanac = "CREATE DATABASE Almanac";

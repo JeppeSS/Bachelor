@@ -22,6 +22,7 @@ int database_clean(struct database *db);
 int addService(struct database *db, char* name, char* desc, char* perm, char* id);
 int addIdentity(struct database *db, char* name, char* org, char* role, char* id);
 
+int countLines(char *filename);
 int splitTestData(struct database *db, char* testData, int numData, int iS);
 char *readTestData(char *filename);
 

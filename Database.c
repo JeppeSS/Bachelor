@@ -188,7 +188,7 @@ int splitTestData(struct database *db, char* testData, int numData, int iS){
             return EXIT_FAILURE;
         }
         
-        id   = strtok(NULL, "\n");
+        id  = strtok(NULL, "\n");
         
         if(id == NULL){
             fprintf(stderr, "[Error] Wrong file format\n");
@@ -215,13 +215,47 @@ int splitTestData(struct database *db, char* testData, int numData, int iS){
 
 }
 
+
+int countLines(char *filename){
+    
+    FILE *fp = fopen(filename, "r");
+    
+    int count = 0;
+    char c;
+
+
+    if(fp){
+
+        for(c = getc(fp); c != EOF; c = getc(fp)){
+            if(c == '\n'){
+                count++;
+            }
+        }
+
+        fclose(fp);
+
+    } else{
+        fprintf(stderr, "[ERROR] Could not read file: %s\n", filename);
+        return EXIT_FAILURE;
+    }
+
+
+
+    return count;
+
+
+}
+
 int database_addTestData(struct database *db){
     
     char *serviceData = readTestData("Data/serviceData.txt");
     char *identityData = readTestData("Data/identityData.txt");
-    
-    int service  = splitTestData(db, serviceData, 2, 1);
-    int identity = splitTestData(db, identityData, 7, 0);
+
+    int serviceLines = countLines("Data/serviceData.txt");
+    int identityLines = countLines("Data/identityData.txt");
+
+    int service  = splitTestData(db, serviceData, serviceLines, 1);
+    int identity = splitTestData(db, identityData, identityLines, 0);
     
 
     return EXIT_SUCCESS;

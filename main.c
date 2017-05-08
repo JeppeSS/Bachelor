@@ -10,6 +10,7 @@ int main(int argc, char* argv[]){
     database_init(&db, "localhost", "root", "kirk3kLokke_muf%fin", "Almanac");
     database_clean(&db);
     database_generate(&db);
+    database_addTestData(&db);
     database_close(&db);
 
     return 0;    

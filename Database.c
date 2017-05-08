@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <mysql/mysql.h>
 #include "Database.h"
 
@@ -28,13 +29,149 @@ int database_init(struct database *db, char *server, char *user, char *password,
 }
 
 
-int database_addTestData(struct database *db){
+char *readTestData(char *filename){
+    
+    FILE *fp = fopen(filename, "r");
+
+    char *source;
+
+    if(fp){
+
+        /*Go to the end of the file */
+        if(fseek(fp, 0L, SEEK_END) == 0){
+
+            long bufsize = ftell(fp);
+
+            if(bufsize == -1){
+                fprintf(stderr, "[ERROR] Could not read file\n");
+            }
+
+            /* Allocate our buffer to that size.  */
+            source = malloc(sizeof(char) * (bufsize + 1));
+
+            /*  Go back to the start of the file. */
+            if(fseek(fp, 0L, SEEK_SET) != 0){
+                fprintf(stderr, "[ERROR] Could not read file\n");
+            }
+
+            /* Read the entire file into memory. */
+            size_t newLen = fread(source, sizeof(char), bufsize, fp);
+
+            if(ferror(fp) != 0){
+                fprintf(stderr, "[ERROR] Could not read file\n"); 
+            } else {
+                /* Just to be sure that the file has an ending. */
+                source[newLen++] = '\0';
+            }
+
+            fclose(fp);
+        }
+    } else{
+        fprintf(stderr, "[ERROR] Could not read file: %s\n", filename);
+    }
+
+    return source;
+}
+
+
+
+int addService(struct database *db, char* name, char* desc, char* perm, char* id){
     
     if(mysql_select_db(db->con, db->db_name)){
 
         fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
         return EXIT_FAILURE;
     }
+
+    char *insert = "INSERT INTO service_reg(name, description, permission, id) VALUES (";
+    char *query = malloc(strlen(insert) + strlen(name) + strlen(desc) + strlen(perm) + strlen(id) + 10);
+
+    
+    strcpy(query, insert);
+    strcat(query, "'");
+    strcat(query, name);
+    strcat(query, "'");
+    strcat(query, ", ");
+    strcat(query, "'");
+    strcat(query, desc);
+    strcat(query, "'");
+    strcat(query, ", ");
+    strcat(query, "'");
+    strcat(query, perm);
+    strcat(query, "'");
+    strcat(query, ", ");
+    strcat(query, "'");
+    strcat(query, id);
+    strcat(query, "'");
+    strcat(query, ")");
+
+
+    if(mysql_query(db->con, query)){
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+        return EXIT_FAILURE;
+    }
+    
+    return EXIT_SUCCESS;
+}
+
+int splitTestData(struct database *db, char* testData, int numData){
+    
+    char *name = strtok(testData, ",");
+    char *des  = strtok(NULL, ",");
+    char *per  = strtok(NULL, ",");
+    char *id   = strtok(NULL, "\n");
+
+    addService(db, name, des, per, id);
+
+    for(int i = 0; i < (numData-1); i++){
+        name = strtok(NULL, ",");
+
+        if(name == NULL){
+            fprintf(stderr, "[Error] Wrong file format\n");
+            return EXIT_FAILURE;
+        }
+
+        des  = strtok(NULL, ",");
+        
+        if(des == NULL){
+            fprintf(stderr, "[Error] Wrong file format\n");
+            return EXIT_FAILURE;
+        }
+
+        per  = strtok(NULL, ",");
+        
+        if(per == NULL){
+            fprintf(stderr, "[Error] Wrong file format\n");
+            return EXIT_FAILURE;
+        }
+        
+        id   = strtok(NULL, "\n");
+        
+        if(id == NULL){
+            fprintf(stderr, "[Error] Wrong file format\n");
+            return EXIT_FAILURE;
+        }
+        
+        addService(db, name, des, per, id);
+
+    }
+
+    fprintf(stdout, "[OK] Added %d data values to service_reg\n", numData);
+
+    
+    return EXIT_SUCCESS;
+
+
+}
+
+int database_addTestData(struct database *db){
+    
+    char *testData = readTestData("Data/serviceData.txt");
+    
+    int service = splitTestData(db, testData, 2);
+    
+
+
 
 
     return EXIT_SUCCESS;

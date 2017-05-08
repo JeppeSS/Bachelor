@@ -15,7 +15,7 @@ struct database {
 
 int database_init(struct database *db, char *server, char *user, char *password, char *datab);
 int database_close(struct database *db);
-
+int database_addTestData(struct database *db);
 int database_generate(struct database *db);
 int database_clean(struct database *db);
 

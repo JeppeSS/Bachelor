@@ -19,5 +19,9 @@ int database_addTestData(struct database *db);
 int database_generate(struct database *db);
 int database_clean(struct database *db);
 
+int addService(struct database *db, char* name, char* desc, char* perm, char* id);
+
+int splitTestData(struct database *db, char* testData, int numData);
+char *readTestData(char *filename);
 
 #endif

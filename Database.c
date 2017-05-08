@@ -114,14 +114,57 @@ int addService(struct database *db, char* name, char* desc, char* perm, char* id
     return EXIT_SUCCESS;
 }
 
-int splitTestData(struct database *db, char* testData, int numData){
+int addIdentity(struct database *db, char* name, char* org, char* role, char* id){
+    
+    if(mysql_select_db(db->con, db->db_name)){
+
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+        return EXIT_FAILURE;
+    }
+
+    char *insert = "INSERT INTO identity_reg(fullname, organization, role, id) VALUES (";
+    char *query = malloc(strlen(insert) + strlen(name) + strlen(org) + strlen(role) + strlen(id) + 10);
+
+    
+    strcpy(query, insert);
+    strcat(query, "'");
+    strcat(query, name);
+    strcat(query, "'");
+    strcat(query, ", ");
+    strcat(query, "'");
+    strcat(query, org);
+    strcat(query, "'");
+    strcat(query, ", ");
+    strcat(query, "'");
+    strcat(query, role);
+    strcat(query, "'");
+    strcat(query, ", ");
+    strcat(query, "'");
+    strcat(query, id);
+    strcat(query, "'");
+    strcat(query, ")");
+
+
+    if(mysql_query(db->con, query)){
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+        return EXIT_FAILURE;
+    }
+    
+    return EXIT_SUCCESS;
+}
+
+int splitTestData(struct database *db, char* testData, int numData, int iS){
     
     char *name = strtok(testData, ",");
     char *des  = strtok(NULL, ",");
     char *per  = strtok(NULL, ",");
     char *id   = strtok(NULL, "\n");
 
-    addService(db, name, des, per, id);
+    if(iS){
+        addService(db, name, des, per, id);
+    } else {
+        addIdentity(db, name, des, per, id);
+    }
 
     for(int i = 0; i < (numData-1); i++){
         name = strtok(NULL, ",");
@@ -152,11 +195,19 @@ int splitTestData(struct database *db, char* testData, int numData){
             return EXIT_FAILURE;
         }
         
-        addService(db, name, des, per, id);
+        if(iS){
+            addService(db, name, des, per, id);
+        } else {
+            addIdentity(db, name, des, per, id);
+        }
 
     }
-
-    fprintf(stdout, "[OK] Added %d data values to service_reg\n", numData);
+    
+    if(iS){
+        fprintf(stdout, "[OK] Added %d data values to service_reg\n", numData);
+    } else {
+        fprintf(stdout, "[OK] Added %d data values to identity_reg\n", numData);
+    }
 
     
     return EXIT_SUCCESS;
@@ -166,13 +217,12 @@ int splitTestData(struct database *db, char* testData, int numData){
 
 int database_addTestData(struct database *db){
     
-    char *testData = readTestData("Data/serviceData.txt");
+    char *serviceData = readTestData("Data/serviceData.txt");
+    char *identityData = readTestData("Data/identityData.txt");
     
-    int service = splitTestData(db, testData, 2);
+    int service  = splitTestData(db, serviceData, 2, 1);
+    int identity = splitTestData(db, identityData, 7, 0);
     
-
-
-
 
     return EXIT_SUCCESS;
 
@@ -210,7 +260,7 @@ int database_generate(struct database *db){
 
     fprintf(stdout, "[OK] Created Table log\n");
     
-    char *identity_reg_create = "CREATE TABLE identity_reg (fullname VARCHAR(200), organixation VARCHAR(200), role VARCHAR(200), id LONGTEXT)";
+    char *identity_reg_create = "CREATE TABLE identity_reg (fullname VARCHAR(200), organization VARCHAR(200), role VARCHAR(200), id LONGTEXT)";
 
     if(mysql_query(db->con, identity_reg_create)){
         fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));

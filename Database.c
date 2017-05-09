@@ -30,6 +30,57 @@ int database_init(struct database *db, char *server, char *user, char *password,
 }
 
 
+struct service getService(struct database *db, char *name){
+    
+    if(mysql_select_db(db->con, db->db_name)){
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+    }
+    
+    char *query = malloc(strlen(name) + 50);
+
+    char *select = "SELECT * ";
+    
+    strcpy(query, select);
+    strcat(query, "FROM service_reg ");
+    strcat(query, "WHERE ");
+    strcat(query, "name = ");
+    strcat(query, "'");
+    strcat(query, name);
+    strcat(query, "'");
+    
+    if(mysql_query(db->con, query)){
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+    }
+
+    db->res = mysql_store_result(db->con);
+    
+
+    if(db->res == NULL){
+        fprintf(stderr, "[ERROR] %s\n", mysql_error(db->con));
+    }
+
+
+    struct service retService;
+    
+    db->row = mysql_fetch_row(db->res);
+
+
+    if(db->row == NULL){
+        retService.name = "None";
+
+        return retService;
+    }
+
+    retService.name = db->row[0];
+    retService.desc = db->row[1];
+    retService.perm = db->row[2];
+    retService.id   = db->row[3];
+
+    mysql_free_result(db->res);
+
+    return retService;
+
+}
 
 int addService(struct database *db, char* name, char* desc, char* perm, char* id){
     

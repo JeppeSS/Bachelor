@@ -11,7 +11,7 @@ int main(int argc, char* argv[]){
     database_clean(&db);
     database_generate(&db);
     database_addTestData(&db);
-    getService(&db, "GPS");
+    getIdentity(&db, "Jens Peter");
     database_close(&db);
 
     return 0;    

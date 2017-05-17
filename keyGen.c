@@ -6,15 +6,37 @@
 #include "random.h"
 
 
-
-
-Param param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau){
+/* 
+ * === Function ===============================================================
+ *         Name: param_init
+ *
+ *  Description: Initialize all the parameters
+ * ============================================================================
+ */
+int param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau){
 
     param->lambda = lambda;
     param->rho    = rho;
     param->eta    = eta;
     param->gamma  = gamma;
     param->tau    = tau;
+
+    return EXIT_SUCCESS;
+}
+
+/* 
+ * === Function ===============================================================
+ *         Name: sk_init
+ *
+ *  Description: Initialize the secret key
+ * ============================================================================
+ */
+int sk_init(SK *sk){
+
+    // Set SK = 0
+    mpz_init(sk->SK);
+
+    return EXIT_SUCCESS;
 }
 
 

@@ -52,10 +52,10 @@ typedef struct Param Param;
 typedef struct SK SK;
 
 // Initialize the parameters
-Param param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau);
+int param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau);
 
 // Initialize the secret key
-SK sk_init(SK *sk);
+int sk_init(SK *sk);
 
 void genSK(mpz_t sk, int eta);
 void genPK(mpz_t pk, mpz_t sk, int gamma, int rho); 

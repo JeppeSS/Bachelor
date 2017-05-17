@@ -6,6 +6,19 @@
 #include "random.h"
 
 
+
+
+Param param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau){
+
+    param->lambda = lambda;
+    param->rho    = rho;
+    param->eta    = eta;
+    param->gamma  = gamma;
+    param->tau    = tau;
+}
+
+
+
 void genSK(mpz_t sk, int eta){
 
     mpz_t randNum;

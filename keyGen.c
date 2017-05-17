@@ -39,7 +39,6 @@ int sk_init(SK *sk){
     return EXIT_SUCCESS;
 }
 
-
 /* 
  * === Function ===============================================================
  *         Name: pk_init
@@ -51,7 +50,7 @@ int pk_init(PK *pk, Param *param){
     
     // Allocate (tau * byte size of int) size.
     // The PK array contains a array of pointers to mpz_t values.
-    pk->PK = malloc(param->tau * sizeof(int));
+    pk->PK = malloc(param->tau * sizeof(mpz_t));
 
     if(!pk->PK){
         fprintf(stderr, "[Error] Public key memory allocation failed\n");
@@ -68,7 +67,6 @@ int pk_init(PK *pk, Param *param){
 
 }
 
-
 /* 
  * === Function ===============================================================
  *         Name: genSK
@@ -77,6 +75,10 @@ int pk_init(PK *pk, Param *param){
  * ============================================================================
  */
 void genSK(SK *sk, Param *param){
+
+
+    fprintf(stdout, "[OK] Generating Secret key of %d bits\n", param->eta);
+    fprintf(stdout, "[OK] Please wait..\n");
 
     // Initialize the secret key
     int ret = sk_init(sk);
@@ -114,108 +116,166 @@ void genSK(SK *sk, Param *param){
     // Clear allocated memory
     mpz_clear(randNum);
     gmp_randclear(randState);
+    
+    fprintf(stdout, "[OK] Secret key generated\n");
 }
 
-void genPK(mpz_t pk, mpz_t sk, int gamma, int rho){
+/* 
+ * === Function ===============================================================
+ *         Name: pkSample
+ *
+ *  Description: For a specific (eta-bit) odd positive integer SK, the
+ *  following distribution over gamma-bit integers, generates a sample.
+ * ============================================================================
+ */
+void pkSample(mpz_t sample, SK *sk, Param *param){
+    
+    // q <-- Z ∩ [0, 2^{gamma}/SK).
+    // r <-- Z ∩ (-2^{rho}, 2^{rho}). 
+    mpz_t q, r;
 
-    mpz_t q;
-    mpz_t r;
-    mpz_t pow;
-    mpz_t divide;
-    mpz_t tmp;
+    // qEnd = (2^{gamma}/SK) tmp container.
+    mpz_t qEnd; 
 
-    mpz_init(q);
-    mpz_init(r);
-    mpz_init(pow);
-    mpz_init(divide);
-    mpz_init(tmp);
+    // Set all = 0
+    mpz_inits(q, r, qEnd, NULL);
 
-    mpz_ui_pow_ui(pow, 2, gamma);
-    mpz_tdiv_q(divide, pow, sk);
-    mpz_add_ui(divide, divide, 1);
+    
+    // qEnd = (2^{gamma}/SK).
+    mpz_ui_pow_ui(qEnd, 2, param->gamma);
+    mpz_tdiv_q(qEnd, qEnd, sk->SK);
+    
+    // Select random in the defined range
+    randomUniform(q, qEnd);
+    randomRange(r, param->rho);
+    
 
-    randomUniform(q, divide);
-    randomRange(r, rho);
-
-
-    mpz_mul(tmp, sk, q);
-    mpz_add(pk, tmp, r);
+    // sample = sk*q + r
+    mpz_mul(sample, sk->SK, q);
+    mpz_add(sample, sample, r);
+    
+    
+    // Clear allocated memory
+    mpz_clear(q);
+    mpz_clear(r);
+    mpz_clear(qEnd);
+    
 
 }
 
-/*
-void keyGen(mpz_t sk, mpz_t pk[], int lambda, int rho, int eta, int gamma, int tau){
+/* 
+ * === Function ===============================================================
+ *         Name: genPK
+ *
+ *  Description: Generates a public key vector 
+ *  pk = (x_{0}, x_{1}, ..., x_{tau})
+ * ============================================================================
+ */
+void genPK(PK *pk, SK *sk, Param *param){
     
-    genSK(sk, eta);
+    fprintf(stdout, "[OK] Generating Public key vector\n");
+    fprintf(stdout, "[OK] Number of elements in vector: %d\n", param->tau);
+    fprintf(stdout, "[OK] Bit size of each element: %d\n", param->gamma);
+    fprintf(stdout, "[OK] Please wait..\n");
+    
+    // Initialize the public key
+    int ret = pk_init(pk, param);
 
-    
-    for(int i = 0; i < tau; i++){
-        mpz_init(pk[i]);
-        genPK(pk[i], sk, gamma, rho);
+    if(ret){
+        fprintf(stderr, "[Error] The public key could not be initialized\n");
     }
 
-
-    mpz_t tmp; 
-    mpz_init(tmp);
-
-    for(int i = 0; i < tau; i++){
-        if(mpz_cmp(pk[i], tmp) > 0){
-            mpz_set(tmp, pk[i]);
-        }
-    }
-    
 
     mpz_t res;
     mpz_init(res);
 
-    rp(res, sk, pk[0]);
 
-
-    while(mpz_odd_p(res) || mpz_even_p(pk[0])){
-        for(int i = 0; i < tau; i++){
-            mpz_clear(pk[i]);
-            mpz_init(pk[i]);
-            genPK(pk[i], sk, gamma, rho);
-         }
+    // Generate public key vector. Relabel so that x_{0} is the largest.
+    // Restart unless x_{0} is odd and rp(x_{0}) is even.
+    while(mpz_odd_p(res) || mpz_even_p(pk->PK[0])){
         
-        mpz_clear(tmp);
+        // Create sample for all integers in the public key vector
+        for(int i = 0; i < param->tau; i++){
+            pkSample(pk->PK[i], sk, param);
+        }
+
+        // Find the largest element and set it to x_{0}
+        mpz_t tmp; 
         mpz_init(tmp);
 
-        for(int i = 0; i < tau; i++){
-            if(mpz_cmp(pk[i], tmp) > 0){
-                mpz_set(tmp, pk[i]);
-            } 
+        int index;
+
+        for(int i = 0; i < param->tau; i++){
+            if(mpz_cmp(pk->PK[i], tmp) > 0){
+                mpz_set(tmp, pk->PK[i]);
+                index = i;
+            }
         }
+
+        // Swap the elements
+        mpz_set(pk->PK[index], pk->PK[0]);
+        mpz_set(pk->PK[0], tmp);
         
-        mpz_clear(res);
-        mpz_init(res);
-        rp(res, sk, pk[0]);
+        // Clear the tmp variable
+        mpz_clear(tmp);
+      
+        // Remainder of x_{0} with respect to SK.
+        rp(res, sk, pk->PK[0]);
     }
     
-
+    fprintf(stdout, "[OK] Public key generated\n");
 
 }
-*/
-void rp(mpz_t res, mpz_t sk, mpz_t z){
+/* 
+ * === Function ===============================================================
+ *         Name: keyGen
+ *
+ *  Description: Generates the private key and public key with respect
+ *  to the parameters.
+ * ============================================================================
+ */
+
+void keyGen(SK *sk, PK *pk, Param *param){
+    
+    genSK(sk, param);
+    genPK(pk, sk, param);
+}
+
+/* 
+ * === Function ===============================================================
+ *         Name: rp
+ *
+ *  Description: Remainder of z with respect to SK:
+ *  rp(z) = z - qp(z) * SK 
+ * ============================================================================
+ */
+void rp(mpz_t res, SK *sk, mpz_t z){
     
     mpz_t qpRes;
-    mpz_t tmp;
-
-    mpz_init(tmp);
     mpz_init(qpRes);
-    
+
+    // Quotient of z
     qp(qpRes, sk, z);
-    mpz_mul(tmp, qpRes, sk);
-    mpz_sub(res, z, tmp);
+    
+    mpz_mul(qpRes, qpRes, sk->SK);
+    mpz_sub(res, z, qpRes);
 
-
+    // Free allocated memory
+    mpz_clear(qpRes);
 
 }
 
+/* 
+ * === Function ===============================================================
+ *         Name: qp
+ *
+ *  Description: Quotient of z with respect to SK:
+ *  qp(z) =  z/SK
+ * ============================================================================
+ */
+void qp(mpz_t res, SK *sk, mpz_t z){
 
-void qp(mpz_t res, mpz_t sk, mpz_t z){
-
-    mpz_tdiv_q(res, z, sk);
+    mpz_tdiv_q(res, z, sk->SK);
 
 }
 

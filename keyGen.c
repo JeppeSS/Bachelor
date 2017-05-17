@@ -42,6 +42,35 @@ int sk_init(SK *sk){
 
 /* 
  * === Function ===============================================================
+ *         Name: pk_init
+ *
+ *  Description: Initialize the public key vector, according to tau.
+ * ============================================================================
+ */
+int pk_init(PK *pk, Param *param){
+    
+    // Allocate (tau * byte size of int) size.
+    // The PK array contains a array of pointers to mpz_t values.
+    pk->PK = malloc(param->tau * sizeof(int));
+
+    if(!pk->PK){
+        fprintf(stderr, "[Error] Public key memory allocation failed\n");
+        return EXIT_FAILURE;
+    }
+
+    // Set all values in PK to 0
+    for(int i = 0; i < param->tau; i++){
+        mpz_init(pk->PK[i]);
+    }
+
+
+    return EXIT_SUCCESS;
+
+}
+
+
+/* 
+ * === Function ===============================================================
  *         Name: genSK
  *
  *  Description: Generates a secret key, according to the parameters set.

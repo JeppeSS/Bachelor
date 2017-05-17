@@ -48,12 +48,31 @@ struct SK {
     mpz_t SK;
 };
 
+/* 
+ * === Structure ==============================================================
+ *         Name:  Public key (PK)
+ *
+ *  Description: The public key contains a vector 
+ *
+ *  PK = (x_{0}, x_{1}, ..., x_{tau})
+ *
+ *  Where x_{0} is the largest element.
+ * ============================================================================
+ */
+struct PK {
+
+    // Public key vector
+    mpz_t *PK;
+};
+
 typedef struct Param Param; 
 typedef struct SK SK;
+typedef struct PK PK;
 
 // Initializers
 int param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau);
 int sk_init(SK *sk);
+int pk_init(PK *pk, Param *param);
 
 // Generators
 void genSK(SK *sk, Param *param);

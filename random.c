@@ -38,6 +38,8 @@ void randomUniform(mpz_t rand, mpz_t size){
 
     unsigned long seed = genSeed();
 
+    mpz_add_ui(size, size, 1);
+
     gmp_randinit_mt(randState);
     gmp_randseed_ui(randState, seed);
 

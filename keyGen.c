@@ -40,22 +40,51 @@ int sk_init(SK *sk){
 }
 
 
+/* 
+ * === Function ===============================================================
+ *         Name: genSK
+ *
+ *  Description: Generates a secret key, according to the parameters set.
+ * ============================================================================
+ */
+void genSK(SK *sk, Param *param){
 
-void genSK(mpz_t sk, int eta){
+    // Initialize the secret key
+    int ret = sk_init(sk);
 
-    mpz_t randNum;
+    if(ret){
+        fprintf(stderr, "[Error] The secret key could not be initialized\n");
+    }
+
+    // Pseudo-random number placeholder.
+    mpz_t           randNum;
+
+    // Contains the algorithm selection and current state.
     gmp_randstate_t randState;
     
+    // Random seed pulled from /dev/urandom
     unsigned long seed = genSeed();
 
+    // ranNum = 0
     mpz_init(randNum);
 
+    // Init randState for a Mersenne Twister algorithm.
     gmp_randinit_mt(randState);
+    
+    // Set an initial seed value into randState
     gmp_randseed_ui(randState, seed);
 
-    mpz_rrandomb(randNum, randState, eta);
+    // Generate a random integer. The random number will be in the range
+    // 2^{eta-1} - 2^{n}-1 inclusive.
+    mpz_rrandomb(randNum, randState, param->eta);
 
-    mpz_nextprime(sk, randNum);
+    // set SK to be the next prime greather than randNum
+    // Uses a probabilistic algorithm to identity primes.
+    mpz_nextprime(sk->SK, randNum);
+
+    // Clear allocated memory
+    mpz_clear(randNum);
+    gmp_randclear(randState);
 }
 
 void genPK(mpz_t pk, mpz_t sk, int gamma, int rho){
@@ -85,6 +114,7 @@ void genPK(mpz_t pk, mpz_t sk, int gamma, int rho){
 
 }
 
+/*
 void keyGen(mpz_t sk, mpz_t pk[], int lambda, int rho, int eta, int gamma, int tau){
     
     genSK(sk, eta);
@@ -136,7 +166,7 @@ void keyGen(mpz_t sk, mpz_t pk[], int lambda, int rho, int eta, int gamma, int t
 
 
 }
-
+*/
 void rp(mpz_t res, mpz_t sk, mpz_t z){
     
     mpz_t qpRes;

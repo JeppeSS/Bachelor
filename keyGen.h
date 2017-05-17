@@ -51,13 +51,12 @@ struct SK {
 typedef struct Param Param; 
 typedef struct SK SK;
 
-// Initialize the parameters
+// Initializers
 int param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau);
-
-// Initialize the secret key
 int sk_init(SK *sk);
 
-void genSK(mpz_t sk, int eta);
+// Generators
+void genSK(SK *sk, Param *param);
 void genPK(mpz_t pk, mpz_t sk, int gamma, int rho); 
 void keyGen(mpz_t sk, mpz_t pk[], int lambda, int rho, int eta, int gamma, int tau); 
 

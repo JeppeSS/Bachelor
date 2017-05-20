@@ -222,7 +222,8 @@ void genPK(PK *pk, SK *sk, Param *param){
         // Remainder of x_{0} with respect to SK.
         rp(res, sk, pk->PK[0]);
     }
-    
+
+
     fprintf(stdout, "[OK] Public key generated\n");
 
 }

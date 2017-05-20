@@ -1,5 +1,5 @@
-#ifndef KEYGEN
-#define KEYGEN
+#ifndef KEYGEN_H
+#define KEYGEN_H
 
 #include <gmp.h>
 

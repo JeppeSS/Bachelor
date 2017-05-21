@@ -109,9 +109,17 @@ void genSK(SK *sk, Param *param){
     // 2^{eta-1} - 2^{n}-1 inclusive.
     mpz_rrandomb(randNum, randState, param->eta);
 
+    while(mpz_even_p(randNum)){
+        mpz_rrandomb(randNum, randState, param->eta);
+        
+    }
+
     // set SK to be the next prime greather than randNum
     // Uses a probabilistic algorithm to identity primes.
-    mpz_nextprime(sk->SK, randNum);
+    //mpz_nextprime(sk->SK, randNum);
+    mpz_set(sk->SK, randNum);
+
+    
 
     // Clear allocated memory
     mpz_clear(randNum);
@@ -206,7 +214,7 @@ void genPK(PK *pk, SK *sk, Param *param){
         int index;
 
         for(int i = 0; i < param->tau; i++){
-            if(mpz_cmp(pk->PK[i], tmp) > 0){
+            if(mpz_cmp(pk->PK[i], tmp)){
                 mpz_set(tmp, pk->PK[i]);
                 index = i;
             }

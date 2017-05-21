@@ -11,7 +11,8 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     mpz_t subset;
     mpz_t tau;
     mpz_t rand;
-    mpz_inits(sum, subset, tau, rand, NULL);
+    mpz_t r;
+    mpz_inits(r, sum, subset, tau, rand, NULL);
 
 
     mpz_set_ui(tau, param->tau);
@@ -23,9 +24,10 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
         mpz_add(sum, sum, pk->PK[i]);
     }
 
+    
     mpz_mul_ui(sum, sum, 2);
     mpz_mul_ui(rand, rand, 2);
-
+    
     mpz_add(rand, rand, sum);
     mpz_add_ui(rand, rand, c);
 

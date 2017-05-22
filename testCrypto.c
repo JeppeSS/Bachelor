@@ -15,10 +15,6 @@ int main(void){
 
     param_init(&param, 42, 26, 988, 147456, 158); 
     keyGen(&sk, &pk, &param);
-
-    encrypt(chiper, &param, &pk, 1);
-    decrypt(&sk, chiper);
-
    
 
     

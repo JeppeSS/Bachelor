@@ -81,7 +81,5 @@ void keyGen(SK *sk, PK *pk, Param *param);
 
 // Helper functions
 void pkSample(mpz_t sample, SK *sk, Param *param);
-void qp(mpz_t res, SK *sk, mpz_t z);
-void rp(mpz_t res, SK *sk, mpz_t z);
 
 #endif

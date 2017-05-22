@@ -260,6 +260,10 @@ void genPK(PK *pk, SK *sk, Param *param){
     }
 
 
+    // Free memory    
+    mpz_set_ui(res, 0);
+    mpz_clear(res);
+
     fprintf(stdout, "[OK] Public key generated\n");
 
 }

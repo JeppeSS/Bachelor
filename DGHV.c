@@ -5,6 +5,7 @@
 #include "keyGen.h"
 #include "random.h"
 
+
 void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
 
     mpz_t sum;
@@ -25,7 +26,6 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     }
 
     
-    mpz_mul_ui(sum, sum, 2);
     mpz_mul_ui(rand, rand, 2);
     
     mpz_add(rand, rand, sum);

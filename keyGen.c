@@ -121,6 +121,7 @@ void genSK(SK *sk, Param *param){
         mpz_add_ui(randNum, randNum, 1);
     }
 
+    // Keep generating random number until its an odd integer
     while(mpz_even_p(randNum)){
         mpz_rrandomb(randNum, randState, param->eta);
         
@@ -130,8 +131,10 @@ void genSK(SK *sk, Param *param){
     // Uses a probabilistic algorithm to identity primes.
     //mpz_nextprime(sk->SK, randNum);
     mpz_set(sk->SK, randNum);
-
-    
+ 
+    // To prevent attacker to find the secret key in memory.
+    // Override before freeing.
+    mpz_set_ui(randNum, 0);
 
     // Clear allocated memory
     mpz_clear(randNum);

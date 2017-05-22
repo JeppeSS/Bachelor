@@ -110,20 +110,22 @@ void genSK(SK *sk, Param *param){
     // Set an initial seed value into randState
     gmp_randseed_ui(randState, seed);
 
-    // Generate a random integer. The random number will be in the range
-    // 2^{eta-1} - 2^{eta}-1 inclusive.
-    mpz_rrandomb(randNum, randState, param->eta);
-    randomUniform(addOne, size); 
-
-    // Extend the range from 2^{eta-1} - 2^{n}
-    // If addOne = 1, then add one to it.
-    if(mpz_cmp_ui(addOne, 0)){
-        mpz_add_ui(randNum, randNum, 1);
-    }
+    mpz_set_ui(randNum, 0);
 
     // Keep generating random number until its an odd integer
     while(mpz_even_p(randNum)){
+        
+        // Generate a random integer. The random number will be in the range
+        // 2^{eta-1} - 2^{eta}-1 inclusive.
         mpz_rrandomb(randNum, randState, param->eta);
+        
+        // Extend the range from 2^{eta-1} - 2^{n}
+        // If addOne = 1, then add one to it.
+        randomUniform(addOne, size); 
+        
+        if(mpz_cmp_ui(addOne, 0)){
+            mpz_add_ui(randNum, randNum, 1);
+        }
         
     }
 
@@ -131,12 +133,14 @@ void genSK(SK *sk, Param *param){
     // Uses a probabilistic algorithm to identity primes.
     //mpz_nextprime(sk->SK, randNum);
     mpz_set(sk->SK, randNum);
- 
+
     // To prevent attacker to find the secret key in memory.
     // Override before freeing.
     mpz_set_ui(randNum, 0);
+    mpz_set_ui(addOne, 0);
 
     // Clear allocated memory
+    mpz_clear(addOne);
     mpz_clear(randNum);
     gmp_randclear(randState);
     

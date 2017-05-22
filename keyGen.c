@@ -48,7 +48,7 @@ int sk_init(SK *sk){
  */
 int pk_init(PK *pk, Param *param){
     
-    // Allocate (tau * byte size of int) size.
+    // Allocate (tau * byte size of mpz_t struct) size.
     // The PK array contains a array of pointers to mpz_t values.
     pk->PK = malloc(param->tau * sizeof(mpz_t));
 

@@ -89,6 +89,8 @@ void genSK(SK *sk, Param *param){
 
     // Pseudo-random number placeholder.
     mpz_t           randNum;
+    mpz_t           addOne;
+    mpz_t           size;
 
     // Contains the algorithm selection and current state.
     gmp_randstate_t randState;
@@ -96,8 +98,11 @@ void genSK(SK *sk, Param *param){
     // Random seed pulled from /dev/urandom
     unsigned long seed = genSeed();
 
-    // ranNum = 0
-    mpz_init(randNum);
+    // ranNum = 0, addOne = 0
+    mpz_inits(randNum, addOne, size, NULL);
+    
+    // Make a boolean random 0 or 1
+    mpz_set_ui(size, 1);
 
     // Init randState for a Mersenne Twister algorithm.
     gmp_randinit_mt(randState);
@@ -106,8 +111,15 @@ void genSK(SK *sk, Param *param){
     gmp_randseed_ui(randState, seed);
 
     // Generate a random integer. The random number will be in the range
-    // 2^{eta-1} - 2^{n}-1 inclusive.
+    // 2^{eta-1} - 2^{eta}-1 inclusive.
     mpz_rrandomb(randNum, randState, param->eta);
+    randomUniform(addOne, size); 
+
+    // Extend the range from 2^{eta-1} - 2^{n}
+    // If addOne = 1, then add one to it.
+    if(mpz_cmp_ui(addOne, 0)){
+        mpz_add_ui(randNum, randNum, 1);
+    }
 
     while(mpz_even_p(randNum)){
         mpz_rrandomb(randNum, randState, param->eta);

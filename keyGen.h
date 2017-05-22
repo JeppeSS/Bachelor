@@ -61,6 +61,10 @@ struct SK {
  */
 struct PK {
 
+    mpz_t x0;
+    
+    unsigned long seed;
+
     // Public key vector
     mpz_t *PK;
 };
@@ -80,6 +84,6 @@ void genPK(PK *pk, SK *sk, Param *param);
 void keyGen(SK *sk, PK *pk, Param *param); 
 
 // Helper functions
-void pkSample(mpz_t sample, SK *sk, Param *param);
+void pkSample(PK *pk, SK *sk, mpz_t sample, Param *param);
 
 #endif

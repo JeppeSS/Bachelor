@@ -48,6 +48,10 @@ int sk_init(SK *sk){
  */
 int pk_init(PK *pk, Param *param){
     
+    // Set x0 = 0
+    mpz_init(pk->x0);
+
+
     // Allocate (tau * byte size of mpz_t struct) size.
     // The PK array contains a array of pointers to mpz_t values.
     pk->PK = malloc(param->tau * sizeof(mpz_t));
@@ -89,8 +93,6 @@ void genSK(SK *sk, Param *param){
 
     // Pseudo-random number placeholder.
     mpz_t           randNum;
-    mpz_t           addOne;
-    mpz_t           size;
 
     // Contains the algorithm selection and current state.
     gmp_randstate_t randState;
@@ -98,47 +100,27 @@ void genSK(SK *sk, Param *param){
     // Random seed pulled from /dev/urandom
     unsigned long seed = genSeed();
 
-    // ranNum = 0, addOne = 0
-    mpz_inits(randNum, addOne, size, NULL);
+    // randNum = 0
+    mpz_init(randNum);
     
-    // Make a boolean random 0 or 1
-    mpz_set_ui(size, 1);
-
     // Init randState for a Mersenne Twister algorithm.
     gmp_randinit_mt(randState);
     
     // Set an initial seed value into randState
     gmp_randseed_ui(randState, seed);
-
-    mpz_set_ui(randNum, 0);
-
-    // Keep generating random number until its an odd integer
-    while(mpz_even_p(randNum)){
         
-        // Generate a random integer. The random number will be in the range
-        // 2^{eta-1} - 2^{eta}-1 inclusive.
-        mpz_rrandomb(randNum, randState, param->eta);
+    // Generate a random integer. The random number will be in the range
+    // 2^{eta-1} - 2^{eta}-1 inclusive.
+    mpz_rrandomb(randNum, randState, param->eta);
         
-        // Extend the range from 2^{eta-1} - 2^{n}
-        // If addOne = 1, then add one to it.
-        randomUniform(addOne, size); 
-        
-        if(mpz_cmp_ui(addOne, 0)){
-            mpz_add_ui(randNum, randNum, 1);
-        }
-        
-    }
-
     // set SK to be the next random odd-integer
-    mpz_set(sk->SK, randNum);
+    mpz_nextprime(sk->SK, randNum);
 
     // To prevent attacker to find the secret key in memory.
     // Override before freeing.
     mpz_set_ui(randNum, 0);
-    mpz_set_ui(addOne, 0);
 
     // Clear allocated memory
-    mpz_clear(addOne);
     mpz_clear(randNum);
     gmp_randclear(randState);
     
@@ -153,39 +135,28 @@ void genSK(SK *sk, Param *param){
  *  following distribution over gamma-bit integers, generates a sample.
  * ============================================================================
  */
-void pkSample(mpz_t sample, SK *sk, Param *param){
-    
-    // q <-- [0, 2^{gamma} % SK).
-    // r <-- [-2^{rho}, 2^{rho}]. 
-    mpz_t q, r;
-
-    // qEnd = (2^{gamma}/SK) tmp container.
-    mpz_t qEnd; 
-
-    // Set all = 0
-    mpz_inits(q, r, qEnd, NULL);
+void pkSample(PK *pk, SK *sk, mpz_t sample, Param *param){
 
     
-    // qEnd = (2^{gamma} % SK).
-    mpz_ui_pow_ui(qEnd, 2, param->gamma);
-    mpz_mod(qEnd, qEnd, sk->SK);
-    
-    // Select random in the defined range
-    randomUniform(q, qEnd);
-    randomRange(r, param->rho);
-    
+    mpz_t ri;
+    mpz_t Xi;
+    mpz_t xi;
 
-    // sample = sk*q + 2r
-    mpz_mul(sample, sk->SK, q);
-    mpz_mul_ui(r, r, 2);
-    mpz_add(sample, sample, r);
+    mpz_inits(xi, Xi, ri, NULL);
+
+    randomRange(ri, param->rho);
+
+
+    randomBitSeed(xi, pk->seed, param->gamma);
+    randomBitSeed(Xi, pk->seed, param->lambda + param->eta);
     
-    
-    // Clear allocated memory
-    mpz_clear(q);
-    mpz_clear(r);
-    mpz_clear(qEnd);
-    
+    mpz_fdiv_q(Xi, Xi, sk->SK);
+    mpz_mod(xi, xi, sk->SK);
+
+    mpz_mul(Xi, Xi, sk->SK);
+    mpz_add(xi, xi, Xi);
+    mpz_sub(sample, xi, ri);
+
 
 }
 
@@ -211,57 +182,25 @@ void genPK(PK *pk, SK *sk, Param *param){
         fprintf(stderr, "[Error] The public key could not be initialized\n");
     }
 
+    mpz_t q0;
+    mpz_t tmp;
 
-    mpz_t res;
-    mpz_init(res);
+    mpz_inits(q0, tmp, NULL);
+    
+    mpz_ui_pow_ui(q0, 2, param->gamma);
+    mpz_mod(q0, q0, sk->SK);
+    
+    randomUniform(tmp, q0);
+
+    mpz_mul(pk->x0, tmp, sk->SK);
+
+    pk->seed = genSeed();
 
 
-    // Generate public key vector. Relabel so that x_{0} is the largest.
-    // Restart unless x_{0} is odd and rp(x_{0}) is even.
-    while(mpz_odd_p(res) || mpz_even_p(pk->PK[0])){
-        
-        // Create sample for all integers in the public key vector
-        for(int i = 0; i < param->tau; i++){
-            pkSample(pk->PK[i], sk, param);
-        }
-
-        // Find the largest element and set it to x_{0}
-        mpz_t tmp; 
-        mpz_init(tmp);
-        int index;
-
-        // Only swap if needed
-        int swap = 0;
-
-        mpz_set(tmp, pk->PK[0]);
-
-        for(int i = 0; i < param->tau; i++){
-            if(mpz_cmp(tmp, pk->PK[i]) < 0){
-                mpz_set(tmp, pk->PK[i]);
-                index = i;
-
-                swap = 1;
-            }
-        }
-        
-        if(swap){
-            // Swap the elements
-            mpz_set(pk->PK[index], pk->PK[0]);
-            mpz_set(pk->PK[0], tmp);
-        }
-        
-        // Clear the tmp variable
-        mpz_set_ui(tmp, 0);
-        mpz_clear(tmp);
-      
-        // Remainder of x_{0} with respect to SK.
-        mpz_mod(res, pk->PK[0], sk->SK);
+    for(int i = 0; i < param->tau; i++){
+        pkSample(pk, sk, pk->PK[i], param);
     }
 
-
-    // Free memory    
-    mpz_set_ui(res, 0);
-    mpz_clear(res);
 
     fprintf(stdout, "[OK] Public key generated\n");
 

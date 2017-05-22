@@ -129,9 +129,7 @@ void genSK(SK *sk, Param *param){
         
     }
 
-    // set SK to be the next prime greather than randNum
-    // Uses a probabilistic algorithm to identity primes.
-    //mpz_nextprime(sk->SK, randNum);
+    // set SK to be the next random odd-integer
     mpz_set(sk->SK, randNum);
 
     // To prevent attacker to find the secret key in memory.
@@ -157,7 +155,7 @@ void genSK(SK *sk, Param *param){
  */
 void pkSample(mpz_t sample, SK *sk, Param *param){
     
-    // q <-- [0, 2^{gamma}/SK).
+    // q <-- [0, 2^{gamma} % SK).
     // r <-- [-2^{rho}, 2^{rho}]. 
     mpz_t q, r;
 
@@ -168,17 +166,19 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     mpz_inits(q, r, qEnd, NULL);
 
     
-    // qEnd = (2^{gamma}/SK).
+    // qEnd = (2^{gamma} % SK).
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
-    mpz_tdiv_q(qEnd, qEnd, sk->SK);
+    //mpz_tdiv_q(qEnd, qEnd, sk->SK);
+    mpz_mod(qEnd, qEnd, sk->SK);
     
     // Select random in the defined range
     randomUniform(q, qEnd);
     randomRange(r, param->rho);
     
 
-    // sample = sk*q + r
+    // sample = sk*q + 2r
     mpz_mul(sample, sk->SK, q);
+    mpz_mul_ui(r, r, 2);
     mpz_add(sample, sample, r);
     
     
@@ -256,7 +256,7 @@ void genPK(PK *pk, SK *sk, Param *param){
         mpz_clear(tmp);
       
         // Remainder of x_{0} with respect to SK.
-        rp(res, sk, pk->PK[0]);
+        mpz_mod(res, pk->PK[0], sk->SK);
     }
 
 
@@ -281,42 +281,3 @@ void keyGen(SK *sk, PK *pk, Param *param){
     genSK(sk, param);
     genPK(pk, sk, param);
 }
-
-/* 
- * === Function ===============================================================
- *         Name: rp
- *
- *  Description: Remainder of z with respect to SK:
- *  rp(z) = z - qp(z) * SK 
- * ============================================================================
- */
-void rp(mpz_t res, SK *sk, mpz_t z){
-    
-    mpz_t qpRes;
-    mpz_init(qpRes);
-
-    // Quotient of z
-    qp(qpRes, sk, z);
-    
-    mpz_mul(qpRes, qpRes, sk->SK);
-    mpz_sub(res, z, qpRes);
-
-    // Free allocated memory
-    mpz_clear(qpRes);
-
-}
-
-/* 
- * === Function ===============================================================
- *         Name: qp
- *
- *  Description: Quotient of z with respect to SK:
- *  qp(z) =  z/SK
- * ============================================================================
- */
-void qp(mpz_t res, SK *sk, mpz_t z){
-
-    mpz_tdiv_q(res, z, sk->SK);
-
-}
-

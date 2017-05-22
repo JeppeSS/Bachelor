@@ -157,8 +157,8 @@ void genSK(SK *sk, Param *param){
  */
 void pkSample(mpz_t sample, SK *sk, Param *param){
     
-    // q <-- Z ∩ [0, 2^{gamma}/SK).
-    // r <-- Z ∩ (-2^{rho}, 2^{rho}). 
+    // q <-- [0, 2^{gamma}/SK).
+    // r <-- [-2^{rho}, 2^{rho}]. 
     mpz_t q, r;
 
     // qEnd = (2^{gamma}/SK) tmp container.
@@ -229,21 +229,30 @@ void genPK(PK *pk, SK *sk, Param *param){
         // Find the largest element and set it to x_{0}
         mpz_t tmp; 
         mpz_init(tmp);
-
         int index;
 
+        // Only swap if needed
+        int swap = 0;
+
+        mpz_set(tmp, pk->PK[0]);
+
         for(int i = 0; i < param->tau; i++){
-            if(mpz_cmp(pk->PK[i], tmp)){
+            if(mpz_cmp(tmp, pk->PK[i]) < 0){
                 mpz_set(tmp, pk->PK[i]);
                 index = i;
+
+                swap = 1;
             }
         }
-
-        // Swap the elements
-        mpz_set(pk->PK[index], pk->PK[0]);
-        mpz_set(pk->PK[0], tmp);
+        
+        if(swap){
+            // Swap the elements
+            mpz_set(pk->PK[index], pk->PK[0]);
+            mpz_set(pk->PK[0], tmp);
+        }
         
         // Clear the tmp variable
+        mpz_set_ui(tmp, 0);
         mpz_clear(tmp);
       
         // Remainder of x_{0} with respect to SK.

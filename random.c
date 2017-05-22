@@ -42,6 +42,25 @@ unsigned long genSeed(void){
 
 }
 
+
+void randomBitSeed(mpz_t rand, unsigned int seed, int size){
+    
+    // Contains the algorithm selection and current state.
+    gmp_randstate_t randState;
+    
+    // Init randState for a Mersenne Twister algorithm.
+    gmp_randinit_mt(randState);
+    
+    // Set an initial seed value into randState.
+    gmp_randseed_ui(randState, seed);
+
+    // Generates the random integer.
+    mpz_urandomb(rand, randState, size);
+
+    // Free allocated memory for randState.
+    gmp_randclear(randState);
+}
+
 /* 
  * === Function ===============================================================
  *         Name: randomUniform

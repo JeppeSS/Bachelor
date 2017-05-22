@@ -20,6 +20,13 @@ int main(void){
     encrypt(chiper, &param, &pk, 1);
     decrypt(&sk, chiper);
 
+    /*
+    param_init(&param, 52, 41, 10, 10, 572); 
+    genSK(&sk, &param);
+    */
+
+
+
 
 
 

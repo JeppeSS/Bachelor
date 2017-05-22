@@ -168,7 +168,6 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     
     // qEnd = (2^{gamma} % SK).
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
-    //mpz_tdiv_q(qEnd, qEnd, sk->SK);
     mpz_mod(qEnd, qEnd, sk->SK);
     
     // Select random in the defined range

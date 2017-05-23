@@ -179,9 +179,10 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     // Select random in the defined range
     randomUniform(q, qEnd);
     randomRange(r, param->rho);
-    
+
     // sample = sk*q + r
     mpz_mul(sample, sk->SK, q);
+    mpz_mul_si(r, r, 2);
     mpz_add(sample, sample, r);
     
     // Set values to 0 and free memory.

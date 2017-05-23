@@ -75,8 +75,7 @@ int pk_init(PK *pk, Param *param){
  * ============================================================================
  */
 void genSK(SK *sk, Param *param){
-
-
+    
     fprintf(stdout, "[OK] Generating Secret key of %d bits\n", param->eta);
     fprintf(stdout, "[OK] Please wait..\n");
 
@@ -165,7 +164,6 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     // Set all = 0
     mpz_inits(q, r, qEnd, NULL);
 
-    
     // qEnd = (2^{gamma} % SK).
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
     mpz_mod(qEnd, qEnd, sk->SK);
@@ -174,14 +172,16 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     randomUniform(q, qEnd);
     randomRange(r, param->rho);
     
-
     // sample = sk*q + 2r
     mpz_mul(sample, sk->SK, q);
     mpz_mul_ui(r, r, 2);
     mpz_add(sample, sample, r);
     
-    
-    // Clear allocated memory
+    // Set values to 0 and free memory.
+    mpz_set_ui(q, 0);
+    mpz_set_ui(r, 0);
+    mpz_set_ui(qEnd, 0);
+
     mpz_clear(q);
     mpz_clear(r);
     mpz_clear(qEnd);
@@ -266,6 +266,7 @@ void genPK(PK *pk, SK *sk, Param *param){
     fprintf(stdout, "[OK] Public key generated\n");
 
 }
+
 /* 
  * === Function ===============================================================
  *         Name: keyGen
@@ -274,9 +275,54 @@ void genPK(PK *pk, SK *sk, Param *param){
  *  to the parameters.
  * ============================================================================
  */
-
-void keyGen(SK *sk, PK *pk, Param *param){
-    
+void keyGen(SK *sk, PK *pk, Param *param){    
     genSK(sk, param);
     genPK(pk, sk, param);
 }
+
+
+/* 
+ * === Function ===============================================================
+ *         Name: skClean
+ *
+ *  Description: Free sk memory
+ * ============================================================================
+ */
+void skClean(SK *sk){
+
+    // Set SK = 0, to prevent attacker reading memory after clear.
+    mpz_set_ui(sk->SK, 0);
+    mpz_clear(sk->SK);
+}
+
+/* 
+ * === Function ===============================================================
+ *         Name: pkClean
+ *
+ *  Description: Free pk memory
+ * ============================================================================
+ */
+void pkClean(PK *pk, Param *param){
+
+    // Set all PK values = 0, and free.
+    for(int i = 0; i < param->tau; i++){
+        mpz_set_ui(pk->PK[i], 0);
+        mpz_clear(pk->PK[i]);
+    }
+}
+
+/* 
+ * === Function ===============================================================
+ *         Name: keyClean
+ *
+ *  Description: Free sk and pk memory
+ * ============================================================================
+ */
+void keyClean(SK *sk, PK *pk, Param *param){
+
+    skClean(sk);
+    pkClean(pk, param);
+}
+
+
+

@@ -82,4 +82,9 @@ void keyGen(SK *sk, PK *pk, Param *param);
 // Helper functions
 void pkSample(mpz_t sample, SK *sk, Param *param);
 
+
+// Cleanup
+void skClean(SK *sk);
+void pkClean(PK *pk, Param *param);
+void keyClean(SK *sk, PK *pk, Param *param);
 #endif

@@ -30,7 +30,7 @@ unsigned long genSeed(void){
     }
 
     if (fread(buf, 1, sizeof buf, fp) != sizeof buf){
-        fprintf(stderr, "[Error] Not enough bytes (expected %u)\n", RANDOM_PATH, (unsigned) sizeof buf);
+        fprintf(stderr, "[Error] Not enough bytes");
         return EXIT_FAILURE;
     }
 

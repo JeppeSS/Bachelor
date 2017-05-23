@@ -36,7 +36,7 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
 }
 
 void evaluate(mpz_t sum, C_List *list){
-    for(int i=0; i < list->list_length; i++){
+    for(unsigned short i=0; i < list->list_length; i++){
         if(i == 0){
             mpz_add(sum, list->arguments[i], 0);
         } else{
@@ -46,16 +46,6 @@ void evaluate(mpz_t sum, C_List *list){
 }
 
 void decrypt(SK *sk, mpz_t chiper){
-    
-    mpz_t plain;
-
-    mpz_init(plain);
-
-
-    mpz_mod(plain, chiper, sk->SK);
-    mpz_add_ui(plain, plain, 1);
-    mpz_mod_ui(plain, plain, 2);
-
-    gmp_printf("%Zd\n", plain);
-
+    mpz_mod(chiper, chiper, sk->SK);
+    mpz_mod_ui(chiper, chiper, 2);
 }

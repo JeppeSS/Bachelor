@@ -266,6 +266,7 @@ void genPK(PK *pk, SK *sk, Param *param){
     fprintf(stdout, "[OK] Public key generated\n");
 
 }
+
 /* 
  * === Function ===============================================================
  *         Name: keyGen
@@ -274,13 +275,19 @@ void genPK(PK *pk, SK *sk, Param *param){
  *  to the parameters.
  * ============================================================================
  */
-
 void keyGen(SK *sk, PK *pk, Param *param){    
     genSK(sk, param);
     genPK(pk, sk, param);
 }
 
 
+/* 
+ * === Function ===============================================================
+ *         Name: skClean
+ *
+ *  Description: Free sk memory
+ * ============================================================================
+ */
 void skClean(SK *sk){
 
     // Set SK = 0, to prevent attacker reading memory after clear.
@@ -288,6 +295,13 @@ void skClean(SK *sk){
     mpz_clear(sk->SK);
 }
 
+/* 
+ * === Function ===============================================================
+ *         Name: pkClean
+ *
+ *  Description: Free pk memory
+ * ============================================================================
+ */
 void pkClean(PK *pk, Param *param){
 
     // Set all PK values = 0, and free.
@@ -297,6 +311,13 @@ void pkClean(PK *pk, Param *param){
     }
 }
 
+/* 
+ * === Function ===============================================================
+ *         Name: keyClean
+ *
+ *  Description: Free sk and pk memory
+ * ============================================================================
+ */
 void keyClean(SK *sk, PK *pk, Param *param){
 
     skClean(sk);

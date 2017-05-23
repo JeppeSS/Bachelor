@@ -35,6 +35,16 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
 
 }
 
+void evaluate(mpz_t sum, C_List *list){
+    for(int i=0; i < list->list_length; i++){
+        if(i == 0){
+            mpz_add(sum, list->arguments[i], 0);
+        } else{
+            mpz_add(sum, list->arguments[i], sum);
+        }
+    }
+}
+
 void decrypt(SK *sk, mpz_t chiper){
     
     mpz_t plain;

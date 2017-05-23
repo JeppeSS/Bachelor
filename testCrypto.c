@@ -3,6 +3,7 @@
 
 #include "keyGen.h"
 #include "DGHV.h"
+#include "random.h"
 
 int main(void){
     
@@ -20,5 +21,7 @@ int main(void){
     decrypt(&sk, chiper);
 
     keyClean(&sk, &pk, &param);
+
+
     return 0;
 }

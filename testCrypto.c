@@ -16,10 +16,11 @@ int main(void){
     mpz_t chiper3;
     mpz_t chiper4;
     mpz_t chiper5;
+    mpz_t chiper6;
 
-    mpz_inits(chiper1, chiper2, chiper3, chiper4, chiper5, NULL);
+    mpz_inits(chiper1, chiper2, chiper3, chiper4, chiper5, chiper6, NULL);
 
-    param_init(&param, 42, 26, 988, 147456, 158); 
+    param_init(&param, 10, 10, 100, 10000, 10010); 
     keyGen(&sk, &pk, &param);
 
     encrypt(chiper1, &param, &pk, 1);
@@ -27,12 +28,16 @@ int main(void){
     encrypt(chiper3, &param, &pk, 1);
     encrypt(chiper4, &param, &pk, 1);
     encrypt(chiper5, &param, &pk, 0);
+    encrypt(chiper6, &param, &pk, 1);
 
     decrypt(&sk, chiper1);
     decrypt(&sk, chiper2);
     decrypt(&sk, chiper3);
     decrypt(&sk, chiper4);
     decrypt(&sk, chiper5);
+    decrypt(&sk, chiper6);
+
+
 
     keyClean(&sk, &pk, &param);
 

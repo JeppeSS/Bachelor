@@ -174,11 +174,12 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
     mpz_mod(qEnd2, qEnd, sk->SK);
     mpz_sub(qEnd, qEnd, qEnd2);
-    mpz_fdiv_q(qEnd, qEnd, sk->SK);
+    mpz_cdiv_q(qEnd, qEnd, sk->SK);
     
     // Select random in the defined range
     randomUniform(q, qEnd);
-    randomRange(r, param->rho);
+    randomRange(r, param->rho*2);
+
 
     // sample = sk*q + r
     mpz_mul(sample, sk->SK, q);

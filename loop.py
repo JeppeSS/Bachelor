@@ -1,9 +1,13 @@
 #!/usr/bin/python
 
 import os
+import sys
+
+args = sys.argv
+loops = int(args[1])
 
 os.system("echo '' > out.txt")
-for i in range(3) :
+for i in range(loops) :
     os.system("./program.o >> out.txt")
 
 fo = open("out.txt", "r")

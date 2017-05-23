@@ -75,8 +75,7 @@ int pk_init(PK *pk, Param *param){
  * ============================================================================
  */
 void genSK(SK *sk, Param *param){
-
-
+    
     fprintf(stdout, "[OK] Generating Secret key of %d bits\n", param->eta);
     fprintf(stdout, "[OK] Please wait..\n");
 
@@ -165,7 +164,6 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     // Set all = 0
     mpz_inits(q, r, qEnd, NULL);
 
-    
     // qEnd = (2^{gamma} % SK).
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
     mpz_mod(qEnd, qEnd, sk->SK);
@@ -174,14 +172,16 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     randomUniform(q, qEnd);
     randomRange(r, param->rho);
     
-
     // sample = sk*q + 2r
     mpz_mul(sample, sk->SK, q);
     mpz_mul_ui(r, r, 2);
     mpz_add(sample, sample, r);
     
-    
-    // Clear allocated memory
+    // Set values to 0 and free memory.
+    mpz_set_ui(q, 0);
+    mpz_set_ui(r, 0);
+    mpz_set_ui(qEnd, 0);
+
     mpz_clear(q);
     mpz_clear(r);
     mpz_clear(qEnd);

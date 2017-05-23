@@ -19,28 +19,6 @@ int main(void){
     encrypt(chiper, &param, &pk, 1);
     decrypt(&sk, chiper);
 
-   
-
-    
-    /*
-    param_init(&param, 52, 10, 10, 10, 10); 
-    keyGen(&sk, &pk, &param);
-   
-    gmp_printf("SK: %Zd\n", sk.SK);
-
-    for(int i = 0; i < param.tau; i++){
-        gmp_printf("PK VEC: %Zd\n", pk.PK[i]);
-    } 
-
-    
-    encrypt(chiper, &param, &pk, 1);
-    decrypt(&sk, chiper);
-    
-    */
-
-
-
-
-
+    keyClean(&sk, &pk, &param);
     return 0;
 }

@@ -275,8 +275,33 @@ void genPK(PK *pk, SK *sk, Param *param){
  * ============================================================================
  */
 
-void keyGen(SK *sk, PK *pk, Param *param){
-    
+void keyGen(SK *sk, PK *pk, Param *param){    
     genSK(sk, param);
     genPK(pk, sk, param);
 }
+
+
+void skClean(SK *sk){
+
+    // Set SK = 0, to prevent attacker reading memory after clear.
+    mpz_set_ui(sk->SK, 0);
+    mpz_clear(sk->SK);
+}
+
+void pkClean(PK *pk, Param *param){
+
+    // Set all PK values = 0, and free.
+    for(int i = 0; i < param->tau; i++){
+        mpz_set_ui(pk->PK[i], 0);
+        mpz_clear(pk->PK[i]);
+    }
+}
+
+void keyClean(SK *sk, PK *pk, Param *param){
+
+    skClean(sk);
+    pkClean(pk, param);
+}
+
+
+

@@ -88,8 +88,9 @@ void genSK(SK *sk, Param *param){
 
     // Pseudo-random number placeholder.
     mpz_t           randNum;
-    mpz_t           addOne;
     mpz_t           size;
+    mpz_t           minSize;
+    mpz_t           maxSize;
 
     // Contains the algorithm selection and current state.
     gmp_randstate_t randState;
@@ -98,8 +99,13 @@ void genSK(SK *sk, Param *param){
     unsigned long seed = genSeed();
 
     // ranNum = 0, addOne = 0
-    mpz_inits(randNum, addOne, size, NULL);
+    mpz_inits(randNum, minSize, maxSize, size, NULL);
     
+    mpz_set_ui(minSize, 2);
+    mpz_set_ui(maxSize, 2);
+    mpz_pow_ui(minSize, minSize, param->eta-1);
+    mpz_pow_ui(maxSize, maxSize, param->eta);
+
     // Make a boolean random 0 or 1
     mpz_set_ui(size, 1);
 
@@ -109,21 +115,17 @@ void genSK(SK *sk, Param *param){
     // Set an initial seed value into randState
     gmp_randseed_ui(randState, seed);
 
-    mpz_set_ui(randNum, 0);
 
     // Keep generating random number until its an odd integer
     while(mpz_even_p(randNum)){
         
+        mpz_clear(randNum);
+        mpz_init(randNum);
+        
         // Generate a random integer. The random number will be in the range
         // 2^{eta-1} - 2^{eta}-1 inclusive.
-        mpz_rrandomb(randNum, randState, param->eta);
-        
-        // Extend the range from 2^{eta-1} - 2^{n}
-        // If addOne = 1, then add one to it.
-        randomUniform(addOne, size); 
-        
-        if(mpz_cmp_ui(addOne, 0)){
-            mpz_add_ui(randNum, randNum, 1);
+        while((mpz_cmp(randNum, minSize) < 0) || mpz_cmp(randNum, maxSize) > 0){
+            randomUniform(randNum, maxSize);
         }
         
     }
@@ -134,12 +136,15 @@ void genSK(SK *sk, Param *param){
     // To prevent attacker to find the secret key in memory.
     // Override before freeing.
     mpz_set_ui(randNum, 0);
-    mpz_set_ui(addOne, 0);
+    mpz_set_ui(maxSize, 0);
+    mpz_set_ui(minSize, 0);
 
     // Clear allocated memory
-    mpz_clear(addOne);
     mpz_clear(randNum);
+    mpz_clear(maxSize);
+    mpz_clear(minSize);
     gmp_randclear(randState);
+
     
     fprintf(stdout, "[OK] Secret key generated\n");
 }
@@ -160,21 +165,23 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
 
     // qEnd = (2^{gamma}/SK) tmp container.
     mpz_t qEnd; 
+    mpz_t qEnd2;
 
     // Set all = 0
-    mpz_inits(q, r, qEnd, NULL);
+    mpz_inits(q, r, qEnd, qEnd2, NULL);
 
     // qEnd = (2^{gamma} % SK).
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
-    mpz_mod(qEnd, qEnd, sk->SK);
+    mpz_mod(qEnd2, qEnd, sk->SK);
+    mpz_sub(qEnd, qEnd, qEnd2);
+    mpz_fdiv_q(qEnd, qEnd, sk->SK);
     
     // Select random in the defined range
     randomUniform(q, qEnd);
     randomRange(r, param->rho);
     
-    // sample = sk*q + 2r
+    // sample = sk*q + r
     mpz_mul(sample, sk->SK, q);
-    mpz_mul_ui(r, r, 2);
     mpz_add(sample, sample, r);
     
     // Set values to 0 and free memory.

@@ -3,6 +3,7 @@
 
 #include "keyGen.h"
 #include "DGHV.h"
+#include "random.h"
 
 int main(void){
     printf("STARTING -> encryption/decryption test SUIT\n");
@@ -75,5 +76,7 @@ int main(void){
     */
 
     keyClean(&sk, &pk, &param);
+
+
     return 0;
 }

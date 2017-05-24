@@ -45,6 +45,7 @@ void evaluate(mpz_t sum, C_List *list){
     }
 }
 
+
 void decrypt(SK *sk, mpz_t chiper){
     mpz_mod(chiper, chiper, sk->SK);
     mpz_mod_ui(chiper, chiper, 2);

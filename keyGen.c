@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
+#include <math.h>
 
 #include "keyGen.h"
 #include "random.h"
@@ -13,13 +14,14 @@
  *  Description: Initialize all the parameters
  * ============================================================================
  */
-int param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau){
+int param_init(Param *param, int lambda){
 
     param->lambda = lambda;
-    param->rho    = rho;
-    param->eta    = eta;
-    param->gamma  = gamma;
-    param->tau    = tau;
+    param->rho    = lambda;
+    param->rhoM   = 2*lambda;
+    param->eta    = (int) pow(lambda, 2);
+    param->gamma  = (int) pow(lambda, 5);
+    param->tau    = param->gamma + lambda + 1;
 
     return EXIT_SUCCESS;
 }
@@ -178,7 +180,7 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     
     // Select random in the defined range
     randomUniform(q, qEnd);
-    randomRange(r, param->rho*2);
+    randomRange(r, param->rhoM);
 
 
     // sample = sk*q + r

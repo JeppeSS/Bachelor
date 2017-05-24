@@ -43,6 +43,7 @@ void decrypt(SK *sk, mpz_t chiper){
 
 
     mpz_mod(plain, chiper, sk->SK);
+    mpz_add_ui(plain, plain, 1);
     mpz_mod_ui(plain, plain, 2);
 
     gmp_printf("%Zd\n", plain);

@@ -20,7 +20,7 @@ int main(void){
 
     mpz_inits(chiper1, chiper2, chiper3, chiper4, chiper5, chiper6, NULL);
 
-    param_init(&param, 10, 10, 100, 10000, 10010); 
+    param_init(&param, 5); 
     keyGen(&sk, &pk, &param);
 
     encrypt(chiper1, &param, &pk, 1);

@@ -180,7 +180,7 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     
     // Select random in the defined range
     randomUniform(q, qEnd);
-    randomRange(r, param->rhoM);
+    randomRange(r, param->rho);
 
 
     // sample = sk*q + r

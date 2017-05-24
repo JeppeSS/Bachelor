@@ -20,13 +20,13 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     randomRange(rand, param->rho);
     randomUniform(subset, tau);
 
-    for(int i = 0; mpz_cmp_ui(subset, i); i++){
+    for(int i = 1; mpz_cmp_ui(subset, i); i++){
         mpz_add(sum, sum, pk->PK[i]);
     }
 
     
-    mpz_mul_ui(sum, sum, 2);
-    mpz_mul_ui(rand, rand, 2);
+    mpz_mul_si(sum, sum, 2);
+    mpz_mul_si(rand, rand, 2);
     
     mpz_add(rand, rand, sum);
     mpz_add_ui(rand, rand, c);
@@ -34,6 +34,7 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     mpz_mod(chiper, rand, pk->PK[0]);
 
 }
+
 
 void evaluate(mpz_t sum, C_List *list){
     for(unsigned short i=0; i < list->list_length; i++){
@@ -46,7 +47,22 @@ void evaluate(mpz_t sum, C_List *list){
 }
 
 
+void decrypt(SK *sk, mpz_t chiper) {
+
+    mpz_t plain;
+
+    mpz_init(plain);
+
+
+    mpz_mod(plain, chiper, sk->SK);
+    mpz_add_ui(plain, plain, 1);
+    mpz_mod_ui(plain, plain, 2);
+}
+
+/*
 void decrypt(SK *sk, mpz_t chiper){
     mpz_mod(chiper, chiper, sk->SK);
     mpz_mod_ui(chiper, chiper, 2);
 }
+
+ */

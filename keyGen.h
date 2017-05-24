@@ -21,6 +21,7 @@ struct Param {
     
     // Bit-length of noise.
     int rho;
+    int rhoM;
 
     // Bit-length of the secret key.
     int eta;
@@ -70,7 +71,7 @@ typedef struct SK SK;
 typedef struct PK PK;
 
 // Initializers
-int param_init(Param *param, int lambda, int rho, int eta, int gamma, int tau);
+int param_init(Param *param, int lambda);
 int sk_init(SK *sk);
 int pk_init(PK *pk, Param *param);
 

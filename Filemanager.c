@@ -33,6 +33,82 @@ int countLines(char *filename){
     return count;
 }
 
+int readSK(SK *sk, char *filename){
+    
+    FILE *fp = fopen(filename, "rb");
+    
+    char *source;
+
+    if(!fp){
+        fprintf(stderr, "[ERROR] Could not write public key to file\n");
+        return EXIT_FAILURE;
+    }
+
+    long bufsize;
+    
+    /*Go to the end of the file */
+    if(fseek(fp, 0L, SEEK_END) == 0){
+
+        bufsize = ftell(fp);
+
+        if(bufsize == -1){
+            fprintf(stderr, "[ERROR] Could not read file\n");
+        }
+
+        /* Allocate our buffer to that size.  */
+        source = malloc(sizeof(char) * (bufsize + 1));
+
+        /*  Go back to the start of the file. */
+        if(fseek(fp, 0L, SEEK_SET) != 0){
+            fprintf(stderr, "[ERROR] Could not read file\n");
+        }
+
+        /* Read the entire file into memory. */
+        size_t newLen = fread(source, sizeof(char), bufsize, fp);
+
+        if(ferror(fp) != 0){
+            fprintf(stderr, "[ERROR] Could not read file\n"); 
+        } else {
+            /* Just to be sure that the file has an ending. */
+            source[newLen++] = '\0';
+        }
+
+        fclose(fp);
+    }
+
+    char *skVal = malloc(sizeof(char) * (bufsize));
+
+    int x = 0;
+    for(int i = 0; source[i] != '\0'; i++){
+        if(source[i] != '-'  && source[i] != 'B' && source[i] != 'E' &&
+           source[i] != 'G'  && source[i] != 'I' && source[i] != 'N' &&
+           source[i] != '\n' && source[i] != 'D' && source[i] != 'H' && 
+           source[i] != 'V'  && source[i] != 'S' && source[i] != 'C' &&
+           source[i] != 'R'  && source[i] != 'T' && source[i] != 'K' &&
+           source[i] != 'Y'  && source[i] != 'D' && source[i] != ' '){
+
+           skVal[x] = source[i];
+           x++;   
+        }
+    }
+
+    int z = mpz_set_str(sk->SK, skVal, 16);
+
+    if(z < 0){
+        fprintf(stderr, "[ERROR] Could not import secret key\n");
+    }
+
+
+
+    free(skVal);
+    free(source);
+
+
+
+
+    return EXIT_SUCCESS;
+}
+
 
 int writePK(PK *pk, Param *param, char *filename){
     

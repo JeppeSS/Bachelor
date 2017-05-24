@@ -7,6 +7,7 @@
 
 void encrypt(mpz_t chiper, Param *param, PK *pk, int c);
 void decrypt(SK *sk, mpz_t chiper);
+void evaluate(mpz_t chiper, mpz_t chiper1, mpz_t chiper2);
 
 
 

@@ -64,3 +64,8 @@ void decrypt(SK *sk, mpz_t chiper){
     gmp_printf("%Zd\n", plain);
 
 }
+
+
+void evaluate(mpz_t chiper, mpz_t chiper1, mpz_t chiper2){
+    mpz_add(chiper, chiper1, chiper2);
+}

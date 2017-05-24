@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "Filemanager.h"
+#include "keyGen.h"
 
 int countLines(char *filename){
     
@@ -29,6 +31,85 @@ int countLines(char *filename){
 
 
     return count;
+}
+
+
+int writePK(PK *pk, Param *param, char *filename){
+    
+    FILE *fp = fopen(filename, "wb");
+    
+    if(!fp){
+        fprintf(stderr, "[ERROR] Could not write public key to file\n");
+        return EXIT_FAILURE;
+    }
+
+    const char *BEGINPAR = "-----BEGIN DGHV PARAMATERS-----";
+    const char *ENDPAR   = "-----END DGHV PARAMATERS-----";
+
+    const char *BEGINPK = "-----BEGIN DGHV PUBLIC KEY-----";
+    const char *ENDPK   = "-----END DGHV PUBLIC KEY-----";
+    
+
+    unsigned int rhoM = param->rhoM;
+    unsigned int tau  = param->tau;
+
+    fprintf(fp, "%s\n", BEGINPAR);
+    
+    fprintf(fp, "%X\n", rhoM);
+    fprintf(fp, "%X", tau);
+    fprintf(fp, "\n%s\n\n", ENDPAR);
+
+    fprintf(fp, "%s\n", BEGINPK);
+    
+    size_t data;
+    
+    for(unsigned int i = 0; i < param->tau; i++){
+        data = mpz_out_str(fp, 16, pk->PK[i]);
+
+        if(!data){
+            fprintf(stderr, "[ERROR] Could not write public key\n");
+            return EXIT_FAILURE;
+        }
+
+        fprintf(fp, "\n");
+    }
+
+    fprintf(fp, "%s\n", ENDPK);
+    
+    fclose(fp);
+
+    
+    return EXIT_SUCCESS;
+}
+
+int writeSK(SK *sk, char *filename){
+
+    FILE *fp = fopen(filename, "wb");
+    
+    if(!fp){
+        fprintf(stderr, "[ERROR] Could not write secret key to file\n");
+        return EXIT_FAILURE;
+    }
+
+    const char *BEGIN = "-----BEGIN DGHV SECRET KEY-----";
+    const char *END   = "-----END DGHV SECRET KEY-----";
+
+    fprintf(fp, "%s\n", BEGIN);
+
+    size_t data = mpz_out_str(fp, 16, sk->SK);
+
+    if(!data){
+        fprintf(stderr, "[ERROR] Could not write secret key\n");
+        return EXIT_FAILURE;
+    }
+
+    fprintf(fp, "\n%s\n", END);
+
+    
+    fclose(fp);
+
+    return EXIT_SUCCESS;
+
 }
 
 char *readTestData(char *filename){

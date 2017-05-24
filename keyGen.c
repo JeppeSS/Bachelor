@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include <math.h>
+#include <omp.h>
 
 #include "keyGen.h"
 #include "random.h"
@@ -228,7 +229,7 @@ void genPK(PK *pk, SK *sk, Param *param){
     // Generate public key vector. Relabel so that x_{0} is the largest.
     // Restart unless x_{0} is odd and rp(x_{0}) is even.
     while(mpz_odd_p(res) || mpz_even_p(pk->PK[0])){
-        
+        #pragma omp parallel for 
         // Create sample for all integers in the public key vector
         for(int i = 0; i < param->tau; i++){
             pkSample(pk->PK[i], sk, param);

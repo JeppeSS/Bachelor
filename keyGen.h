@@ -17,20 +17,20 @@
 struct Param {
     
     // Security parameter.
-    int lambda;
+    unsigned int lambda;
     
     // Bit-length of noise.
-    int rho;
-    int rhoM;
+    unsigned int rho;
+    unsigned int rhoM;
 
     // Bit-length of the secret key.
-    int eta;
+    unsigned int eta;
 
     // Bit-length of the integers in the public key
-    int gamma;
+    unsigned int gamma;
 
     // Number of integers in the public key
-    int tau;
+    unsigned int tau;
 
 };
 

@@ -172,7 +172,7 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     mpz_ui_pow_ui(qEnd, 2, param->gamma);
     mpz_mod(qEnd2, qEnd, sk->SK);
     mpz_sub(qEnd, qEnd, qEnd2);
-    mpz_cdiv_q(qEnd, qEnd, sk->SK);
+    mpz_tdiv_q(qEnd, qEnd, sk->SK);
     
     // Select random in the defined range
     randomUniform(q, qEnd);
@@ -264,7 +264,7 @@ void genPK(PK *pk, SK *sk, Param *param){
         mpz_clear(tmp);
       
         // Remainder of x_{0} with respect to SK.
-        mpz_fdiv_q(res, res, sk->SK);
+        mpz_tdiv_q(res, pk->PK[0], sk->SK);
         mpz_mod(res, pk->PK[0], sk->SK);
     }
 

@@ -27,8 +27,8 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     
     mpz_mul_si(rand, rand, 2);
     
+    mpz_add_ui(sum, sum, c);
     mpz_add(rand, rand, sum);
-    mpz_add_ui(rand, rand, c);
 
     mpz_mod(chiper, rand, pk->PK[0]);
 
@@ -42,7 +42,6 @@ void decrypt(SK *sk, mpz_t chiper){
 
 
     mpz_mod(plain, chiper, sk->SK);
-    mpz_add_ui(plain, plain, 1);
     mpz_mod_ui(plain, plain, 2);
 
     gmp_printf("%Zd\n", plain);

@@ -119,7 +119,7 @@ void randomRange(mpz_t rand, int rho){
     // else generate positive number
     if(mpz_cmp_ui(posNeg, 0)){
         mpz_urandomb(rand, randState, rho+1);
-        mpz_neg(rand, rand);
+        //mpz_neg(rand, rand);
     } else {
         mpz_urandomb(rand, randState, rho+1);
     }

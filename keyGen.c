@@ -264,6 +264,7 @@ void genPK(PK *pk, SK *sk, Param *param){
         mpz_clear(tmp);
       
         // Remainder of x_{0} with respect to SK.
+        mpz_fdiv_q(res, res, sk->SK);
         mpz_mod(res, pk->PK[0], sk->SK);
     }
 

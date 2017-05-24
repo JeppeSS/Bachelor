@@ -12,7 +12,7 @@ import sys
 args = sys.argv
 loops = int(args[1])
 plain = args[2]
-write = args[3]
+write = int(args[3])
 match = 0
 
 os.system("echo '-------------' > out.txt")
@@ -48,7 +48,7 @@ with open("out.txt", "a") as f :
     f.write("Matches: " + str(match) + "/" + str(loops)  + "\n")
 f.close()
 
-if write == 1 :
+if write :
     with open("out.txt", "r") as f :
         lines = f.readlines()
         for line in lines :

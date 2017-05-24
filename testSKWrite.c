@@ -19,8 +19,6 @@ int main(void){
 
     writeSK(&sk, "key.txt");
 
-    gmp_printf("%Zx\n", sk.SK);
-
 
     skClean(&sk);
 

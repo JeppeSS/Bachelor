@@ -180,7 +180,7 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     
     // Select random in the defined range
     randomUniform(q, qEnd);
-    randomRange(r, param->rhoM);
+    randomRange(r, param->rho);
 
 
     // sample = sk*q + r
@@ -286,10 +286,27 @@ void genPK(PK *pk, SK *sk, Param *param){
  *  to the parameters.
  * ============================================================================
  */
-void keyGen(SK *sk, PK *pk, Param *param){    
+void keyGen(SK *sk, PK *pk, Param *param){
     genSK(sk, param);
     genPK(pk, sk, param);
+    mpz_t tmp;
+    mpz_t tmp2;
+    mpz_inits(tmp, tmp2, NULL);
+    mpz_mod_ui(tmp, pk->PK[0], 2);
+    mpz_cdiv_q(tmp2, pk->PK[0], sk->SK);
+    while( (mpz_cmp_ui(tmp, 0) == 0) || (mpz_even_p(tmp2) == 0)){
+        printf("ZERO if pk equal to 0: %d\n", mpz_cmp_ui(tmp, 0));
+        printf("ZERO if pk/sk is NOT even: %d\n", mpz_even_p(tmp2));
+        pkClean(pk, param);
+        skClean(sk);
+        genSK(sk, param);
+        genPK(pk, sk, param);
+        mpz_mod_ui(tmp, pk->PK[0], 2);
+        mpz_cdiv_q(tmp2, pk->PK[0], sk->SK);
+    }
+
 }
+
 
 
 /* 

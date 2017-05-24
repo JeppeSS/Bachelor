@@ -17,7 +17,7 @@ match = 0
 
 os.system("echo '-------------' > out.txt")
 for i in range(loops) :
-    os.system("./program.o >> out.txt")
+    os.system("./testKeyGen.o >> out.txt")
     os.system("echo '-------------' >> out.txt")
 
 fo = open("out.txt", "r")

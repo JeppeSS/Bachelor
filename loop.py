@@ -3,9 +3,16 @@
 import os
 import sys
 
+# ------------------------ARGUMENTS-------------------------- #
+# 1. Number of iterations                                     #
+# 2. Plaintext bit string                                     #
+# 3. 1 if result should be printed to terminal, 0 otherwise   #
+# ----------------------------------------------------------- #
+
 args = sys.argv
 loops = int(args[1])
 plain = args[2]
+write = args[3]
 match = 0
 
 os.system("echo '-------------' > out.txt")
@@ -40,3 +47,10 @@ for line in f :
 with open("out.txt", "a") as f :
     f.write("Matches: " + str(match) + "/" + str(loops)  + "\n")
 f.close()
+
+if write == 1 :
+    with open("out.txt", "r") as f :
+        lines = f.readlines()
+        for line in lines :
+            print line.rstrip()
+    

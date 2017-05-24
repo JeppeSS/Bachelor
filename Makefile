@@ -1,10 +1,20 @@
-HEADERS = Database.h DGHV.h keyGen.h random.h
+all: testKeyGen testSKWrite testPKWrite
 
-program.o: testCrypto.c DGHV.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o program.o DGHV.c random.c keyGen.c testCrypto.c -lm -lgmp `mysql_config --cflags --libs`  
-program: program.o
-	gcc program.o -o program
+HEADERS = Database.h Filemanager.h DGHV.h keyGen.h random.h
+
+testKeyGen: testCrypto.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
+	gcc -Wall -std=c11 -o testKeyGen.o DGHV.c Filemanager.c random.c keyGen.c testCrypto.c -lm -lgmp `mysql_config --cflags --libs`  
+
+testPKWrite: testPKWrite.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
+	gcc -Wall -std=c11 -o testPKWrite.o DGHV.c Filemanager.c random.c keyGen.c testPKWrite.c -lm -lgmp `mysql_config --cflags --libs`  
+
+testSKWrite: testSKWrite.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
+	gcc -Wall -std=c11 -o testSKWrite.o DGHV.c Filemanager.c random.c keyGen.c testSKWrite.c -lm -lgmp `mysql_config --cflags --libs`  
 
 clean:
-	-rm -f program.o
-	-rm -f program
+	-rm -f testPKWrite.o
+	-rm -f testSKWrite.o
+	-rm -f testKeyGen.o
+	-rm -f testPKWrite
+	-rm -f testKeyGen
+	-rm -f testSKWrite

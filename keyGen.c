@@ -90,7 +90,6 @@ void genSK(SK *sk, Param *param){
 
     // Pseudo-random number placeholder.
     mpz_t           randNum;
-    mpz_t           size;
     mpz_t           minSize;
     mpz_t           maxSize;
 
@@ -101,15 +100,12 @@ void genSK(SK *sk, Param *param){
     unsigned long seed = genSeed();
 
     // ranNum = 0, addOne = 0
-    mpz_inits(randNum, minSize, maxSize, size, NULL);
+    mpz_inits(randNum, minSize, maxSize, NULL);
     
     mpz_set_ui(minSize, 2);
     mpz_set_ui(maxSize, 2);
     mpz_pow_ui(minSize, minSize, param->eta-1);
     mpz_pow_ui(maxSize, maxSize, param->eta);
-
-    // Make a boolean random 0 or 1
-    mpz_set_ui(size, 1);
 
     // Init randState for a Mersenne Twister algorithm.
     gmp_randinit_mt(randState);
@@ -192,10 +188,12 @@ void pkSample(mpz_t sample, SK *sk, Param *param){
     mpz_set_ui(q, 0);
     mpz_set_ui(r, 0);
     mpz_set_ui(qEnd, 0);
+    mpz_set_ui(qEnd2, 0);
 
     mpz_clear(q);
     mpz_clear(r);
     mpz_clear(qEnd);
+    mpz_clear(qEnd2);
     
 
 }
@@ -273,7 +271,7 @@ void genPK(PK *pk, SK *sk, Param *param){
     // Free memory    
     mpz_set_ui(res, 0);
     mpz_clear(res);
-
+    
     fprintf(stdout, "[OK] Public key generated\n");
 
 }

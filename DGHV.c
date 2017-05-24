@@ -9,18 +9,24 @@
 void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
 
     mpz_t sum;
-    mpz_t subset;
     mpz_t tau;
     mpz_t rand;
     mpz_t r;
-    mpz_inits(r, sum, subset, tau, rand, NULL);
+    mpz_inits(r, sum, tau, rand, NULL);
 
     mpz_set_ui(tau, param->tau);
 
-    randomRange(rand, param->rhoM);
-    randomUniform(subset, tau);
+    unsigned int subStart = 0;
+    unsigned int subEnd   = 0;
 
-    for(int i = 1; mpz_cmp_ui(subset, i); i++){
+    while((subEnd < subStart) || (subStart == 0 || subEnd == 0)){
+        subStart = genSeed() % param->tau;
+        subEnd = genSeed() % param->tau;
+    }
+
+    randomRange(rand, param->rhoM);
+
+    for(int i = subStart; i < subEnd; i++){
         mpz_add(sum, sum, pk->PK[i]);
     }
 
@@ -31,6 +37,17 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     mpz_add(rand, rand, sum);
 
     mpz_mod(chiper, rand, pk->PK[0]);
+
+
+    mpz_set_ui(sum, 0);
+    mpz_set_ui(tau, 0);
+    mpz_set_ui(rand, 0);
+    mpz_set_ui(r, 0);
+
+    mpz_clear(sum);
+    mpz_clear(tau);
+    mpz_clear(rand);
+    mpz_clear(r);
 
 }
 

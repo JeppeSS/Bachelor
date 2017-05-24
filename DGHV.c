@@ -25,7 +25,6 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
     }
 
     
-    mpz_mul_si(sum, sum, 2);
     mpz_mul_si(rand, rand, 2);
     
     mpz_add(rand, rand, sum);

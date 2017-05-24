@@ -33,6 +33,95 @@ int countLines(char *filename){
     return count;
 }
 
+int readPK(PK *pk, Param *param, char *filename){
+    
+    FILE *fp = fopen(filename, "rb");
+    
+    char *source;
+
+    if(!fp){
+        fprintf(stderr, "[ERROR] Could not write public key to file\n");
+        return EXIT_FAILURE;
+    }
+
+    long bufsize;
+    
+    /*Go to the end of the file */
+    if(fseek(fp, 0L, SEEK_END) == 0){
+
+        bufsize = ftell(fp);
+
+        if(bufsize == -1){
+            fprintf(stderr, "[ERROR] Could not read file\n");
+        }
+
+        /* Allocate our buffer to that size.  */
+        source = malloc(sizeof(char) * (bufsize + 1));
+
+        /*  Go back to the start of the file. */
+        if(fseek(fp, 0L, SEEK_SET) != 0){
+            fprintf(stderr, "[ERROR] Could not read file\n");
+        }
+
+        /* Read the entire file into memory. */
+        size_t newLen = fread(source, sizeof(char), bufsize, fp);
+
+        if(ferror(fp) != 0){
+            fprintf(stderr, "[ERROR] Could not read file\n"); 
+        } else {
+            /* Just to be sure that the file has an ending. */
+            source[newLen++] = '\0';
+        }
+
+        fclose(fp);
+    }
+    
+    char *lamb = malloc(sizeof(char) * (bufsize));
+
+    int startParam = 32;
+    int x = 0;
+    for(int i = startParam; source[i] != '\n'; i++){
+        lamb[x] = source[i];
+        startParam++;
+        x++;
+    }  
+
+    startParam += 64;
+
+    unsigned int lambda = atoi(lamb);
+
+    param_init(param, lambda);
+    pk_init(pk, param);
+
+    unsigned int z = 0;
+    unsigned int q = 0;
+
+    mpz_t elm;
+    mpz_init(elm);
+
+    char *vec;
+    vec = malloc(sizeof(char) * (param->gamma + 10));
+
+    for(int i = startParam; source[i] != '-'; i++){
+        vec[q] = source[i];
+        q++;
+        
+        if(source[i] == '\n'){
+            mpz_set_str(pk->PK[z], vec, 16);
+            
+            free(vec);
+            vec = malloc(sizeof(char) * (param->gamma + 10));
+            
+            z++;
+            q = 0;
+        }
+    }
+
+    free(vec);
+
+    return 0;
+}
+
 int readSK(SK *sk, char *filename){
     
     FILE *fp = fopen(filename, "rb");
@@ -104,8 +193,6 @@ int readSK(SK *sk, char *filename){
     free(source);
 
 
-
-
     return EXIT_SUCCESS;
 }
 
@@ -126,14 +213,12 @@ int writePK(PK *pk, Param *param, char *filename){
     const char *ENDPK   = "-----END DGHV PUBLIC KEY-----";
     
 
-    unsigned int rhoM = param->rhoM;
-    unsigned int tau  = param->tau;
+    unsigned int lambda = param->lambda;
 
     fprintf(fp, "%s\n", BEGINPAR);
     
-    fprintf(fp, "%X\n", rhoM);
-    fprintf(fp, "%X", tau);
-    fprintf(fp, "\n%s\n\n", ENDPAR);
+    fprintf(fp, "%x\n", lambda);
+    fprintf(fp, "%s\n\n", ENDPAR);
 
     fprintf(fp, "%s\n", BEGINPK);
     

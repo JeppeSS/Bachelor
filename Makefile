@@ -1,4 +1,4 @@
-all: testKeyGen testSKWrite testSKRead testPKWrite
+all: testKeyGen testSKWrite testSKRead testPKRead testPKWrite
 
 HEADERS = Database.h Filemanager.h DGHV.h keyGen.h random.h
 
@@ -14,12 +14,17 @@ testSKWrite: testSKWrite.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
 testSKRead: testSKRead.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
 	gcc -Wall -std=c11 -o testSKRead.o DGHV.c Filemanager.c random.c keyGen.c testSKRead.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
 
+testPKRead: testPKRead.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
+	gcc -Wall -std=c11 -o testPKRead.o DGHV.c Filemanager.c random.c keyGen.c testPKRead.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
+
 clean:
 	-rm -f testPKWrite.o
 	-rm -f testSKWrite.o
 	-rm -f testSKRead.o
+	-rm -f testPKRead.o
 	-rm -f testKeyGen.o
 	-rm -f testPKWrite
 	-rm -f testKeyGen
 	-rm -f testSKWrite
 	-rm -f testSKRead
+	-rm -f testPKRead

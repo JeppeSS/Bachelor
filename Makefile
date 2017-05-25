@@ -1,6 +1,6 @@
-all: testKeyGen testSKWrite testSKRead testPKRead testPKWrite testWrongKey
+all: testKeyGen testSKWrite testSKRead testPKRead testPKWrite testWrongKey testPlaintext
 
-HEADERS = Database.h Filemanager.h DGHV.h keyGen.h random.h
+HEADERS = Database.h Plaintext.h Filemanager.h DGHV.h keyGen.h random.h
 
 testKeyGen: testCrypto.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
 	gcc -Wall -std=c11 -o testKeyGen.o DGHV.c Filemanager.c random.c keyGen.c testCrypto.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
@@ -20,6 +20,9 @@ testPKRead: testPKRead.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
 testWrongKey: testWrongKey.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
 	gcc -Wall -std=c11 -o testWrongKey.o DGHV.c Filemanager.c random.c keyGen.c testWrongKey.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
 
+testPlaintext: testPlaintext.c Plaintext.c $(HEADERS)
+	gcc -Wall -std=c11 -o testPlaintext.o testPlaintext.c Plaintext.c
+
 clean:
 	-rm -f testPKWrite.o
 	-rm -f testSKWrite.o
@@ -27,9 +30,11 @@ clean:
 	-rm -f testPKRead.o
 	-rm -f testKeyGen.o
 	-rm -f testWrongKey.o
+	-rm -f testPlaintext.o
 	-rm -f testPKWrite
 	-rm -f testKeyGen
 	-rm -f testSKWrite
 	-rm -f testSKRead
 	-rm -f testPKRead
 	-rm -f testWrongKey
+	-rm -f testPlaintext

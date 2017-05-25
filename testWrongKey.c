@@ -28,19 +28,19 @@ int main(void){
     readPK(&pk, &param, "public.key");
 
 
-    encrypt(chiper1, &param, &pk, 1);
-    encrypt(chiper2, &param, &pk, 0);
-    encrypt(chiper3, &param, &pk, 1);
-    encrypt(chiper4, &param, &pk, 1);
-    encrypt(chiper5, &param, &pk, 0);
-    encrypt(chiper6, &param, &pk, 1);
+    encryptBit(chiper1, &param, &pk, 1);
+    encryptBit(chiper2, &param, &pk, 0);
+    encryptBit(chiper3, &param, &pk, 1);
+    encryptBit(chiper4, &param, &pk, 1);
+    encryptBit(chiper5, &param, &pk, 0);
+    encryptBit(chiper6, &param, &pk, 1);
 
-    decrypt(&sk, chiper1);
-    decrypt(&sk, chiper2);
-    decrypt(&sk, chiper3);
-    decrypt(&sk, chiper4);
-    decrypt(&sk, chiper5);
-    decrypt(&sk, chiper6);
+    decryptBit(&sk, chiper1);
+    decryptBit(&sk, chiper2);
+    decryptBit(&sk, chiper3);
+    decryptBit(&sk, chiper4);
+    decryptBit(&sk, chiper5);
+    decryptBit(&sk, chiper6);
 
 
 

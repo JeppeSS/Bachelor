@@ -6,7 +6,7 @@
 #include "random.h"
 
 
-void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
+void encryptBit(mpz_t chiper, Param *param, PK *pk, int c){
 
     mpz_t sum;
     mpz_t tau;
@@ -51,7 +51,7 @@ void encrypt(mpz_t chiper, Param *param, PK *pk, int c){
 
 }
 
-void decrypt(SK *sk, mpz_t chiper){
+void decryptBit(SK *sk, mpz_t chiper){
     
     mpz_t plain;
 

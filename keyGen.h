@@ -71,7 +71,7 @@ typedef struct SK SK;
 typedef struct PK PK;
 
 // Initializers
-int param_init(Param *param, int lambda);
+int param_init(Param *param, unsigned int lambda);
 int sk_init(SK *sk);
 int pk_init(PK *pk, Param *param);
 

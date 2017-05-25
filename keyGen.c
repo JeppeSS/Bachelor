@@ -15,7 +15,7 @@
  *  Description: Initialize all the parameters
  * ============================================================================
  */
-int param_init(Param *param, int lambda){
+int param_init(Param *param, unsigned int lambda){
 
     param->lambda = lambda;
     param->rho    = lambda;

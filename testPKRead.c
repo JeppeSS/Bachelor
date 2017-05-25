@@ -13,7 +13,8 @@ int main(void){
 
 
     readPK(&pk, &param, "public.key");
-    gmp_printf("%Zx\n", pk.PK[param.tau-1]);
+
+
 
     pkClean(&pk, &param);
 

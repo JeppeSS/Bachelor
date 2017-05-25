@@ -86,13 +86,14 @@ int readPK(PK *pk, Param *param, char *filename){
         x++;
     }  
 
-    startParam += 64;
+    startParam += 63;
 
     unsigned int lambda = atoi(lamb);
 
+
     param_init(param, lambda);
     pk_init(pk, param);
-
+    
     unsigned int z = 0;
     unsigned int q = 0;
 
@@ -100,18 +101,28 @@ int readPK(PK *pk, Param *param, char *filename){
     mpz_init(elm);
 
     char *vec;
-    vec = malloc(sizeof(char) * (param->gamma + 10));
+    vec = calloc(param->gamma, sizeof(char) * (param->gamma));
 
+    size_t format;
     for(int i = startParam; source[i] != '-'; i++){
-        vec[q] = source[i];
-        q++;
+        if(source[i] != '\n'){
+            vec[q] = source[i];
+            q++;
+        }
         
         if(source[i] == '\n'){
-            mpz_set_str(pk->PK[z], vec, 16);
+            format = mpz_set_str(pk->PK[z], vec, 16);
+
+            
+            if(format == -1){
+                fprintf(stderr, "[ERROR] Wrong public key format\n");
+                return EXIT_FAILURE;
+             }
+
             
             free(vec);
-            vec = malloc(sizeof(char) * (param->gamma + 10));
-            
+            vec = calloc(param->gamma, sizeof(char) * (param->gamma));
+
             z++;
             q = 0;
         }
@@ -218,7 +229,7 @@ int writePK(PK *pk, Param *param, char *filename){
     fprintf(fp, "%s\n", BEGINPAR);
     
     fprintf(fp, "%x\n", lambda);
-    fprintf(fp, "%s\n\n", ENDPAR);
+    fprintf(fp, "%s\n", ENDPAR);
 
     fprintf(fp, "%s\n", BEGINPK);
     
@@ -226,13 +237,13 @@ int writePK(PK *pk, Param *param, char *filename){
     
     for(unsigned int i = 0; i < param->tau; i++){
         data = mpz_out_str(fp, 16, pk->PK[i]);
+        fprintf(fp, "\n");
 
         if(!data){
             fprintf(stderr, "[ERROR] Could not write public key\n");
             return EXIT_FAILURE;
         }
 
-        fprintf(fp, "\n");
     }
 
     fprintf(fp, "%s\n", ENDPK);

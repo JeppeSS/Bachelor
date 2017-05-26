@@ -4,7 +4,17 @@
 #include "DGHV.h"
 #include "keyGen.h"
 #include "random.h"
+#include "Plaintext.h"
+#include "Chipertext.h"
 
+void encrypt(Chipertext *chiper, Param *param, PK *pk, Plaintext *plain){
+
+    chipertext_init(chiper, plain->size);
+
+    for(unsigned int i = 0; i < plain->size; i++){
+        encryptBit(chiper->chiper[i], param, pk, plain->bin[i]);
+    }
+}
 
 void encryptBit(mpz_t chiper, Param *param, PK *pk, int c){
 

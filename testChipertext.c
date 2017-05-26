@@ -12,7 +12,7 @@
 int main(void){
     Plaintext plain;
     Plaintext plain2;
-    plaintext_init(&plain, "Hej");
+    plaintext_init(&plain, "Hej med dig, Dette er en test");
 
     Chipertext chiper;
 
@@ -23,10 +23,6 @@ int main(void){
     param_init(&param, 8);
     keyGen(&sk, &pk, &param);
 
-    for(unsigned int i = 0; i < plain.size; ++i){
-        printf("%d\n", plain.bin[i]);
-    }
-
 
     printf("Encrypting msg: %s\n", plain.msg);
 
@@ -34,9 +30,7 @@ int main(void){
     
     decrypt(&plain2, &sk, &chiper);
     
-    for(unsigned int i = 0; i < plain.size; ++i){
-        printf("%d\n", plain2.bin[i]);
-    }
+    printf("Decrypting msg: %s\n", plain2.msg);
     
 
     

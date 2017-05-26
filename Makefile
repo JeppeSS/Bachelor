@@ -1,9 +1,12 @@
 TARGET = testCrypto.o testSKWrite.o testSKRead.o testPKRead.o testPKWrite.o testWrongKey.o testPlaintext.o testChipertext.o testEval.o testEvalText.o testEvalID.o
 
+
 SRC = DGHV.c Filemanager.c random.c keyGen.c Plaintext.c Chipertext.c
 CC = gcc
 CFLAGS = -std=c11 -Wall -Wextra -g 
 LIBS = -lm -lgmp -fopenmp $(mysql_config --cflags --libs)
+
+
 
 $(info The Almanac program requires GMP version 6.1.2, see https://gmplib.org/)
 $(info )

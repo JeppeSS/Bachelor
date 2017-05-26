@@ -28,6 +28,8 @@ void decrypt(Plaintext *plain, SK *sk, Chipertext *chiper){
         plain->bin[i] = decryptBit(sk, chiper->chiper[i]);
     }
 
+    fromBinary(plain);
+
 }
 
 void encryptBit(mpz_t chiper, Param *param, PK *pk, int c){

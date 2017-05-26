@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <gmp.h>
 
 #include "DGHV.h"
@@ -14,6 +15,19 @@ void encrypt(Chipertext *chiper, Param *param, PK *pk, Plaintext *plain){
     for(unsigned int i = 0; i < plain->size; i++){
         encryptBit(chiper->chiper[i], param, pk, plain->bin[i]);
     }
+}
+
+
+void decrypt(Plaintext *plain, SK *sk, Chipertext *chiper){
+
+    plain->msg = malloc(chiper->size);
+    plain->bin = malloc(chiper->size * (8 * sizeof(int)));
+    plain->size = chiper->size;
+
+    for(unsigned int i = 0; i < plain->size; i++){
+        plain->bin[i] = decryptBit(sk, chiper->chiper[i]);
+    }
+
 }
 
 void encryptBit(mpz_t chiper, Param *param, PK *pk, int c){
@@ -61,7 +75,7 @@ void encryptBit(mpz_t chiper, Param *param, PK *pk, int c){
 
 }
 
-void decryptBit(SK *sk, mpz_t chiper){
+int decryptBit(SK *sk, mpz_t chiper){
     
     mpz_t plain;
 
@@ -71,8 +85,9 @@ void decryptBit(SK *sk, mpz_t chiper){
     mpz_mod(plain, chiper, sk->SK);
     mpz_mod_ui(plain, plain, 2);
 
-    gmp_printf("%Zd\n", plain);
+    int x = mpz_get_ui(plain);
 
+    return x;
 }
 
 

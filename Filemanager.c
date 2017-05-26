@@ -103,7 +103,7 @@ int readPK(PK *pk, Param *param, char *filename){
     char *vec;
     vec = calloc(param->gamma, sizeof(char) * (param->gamma));
 
-    size_t format;
+    int format;
     for(int i = startParam; source[i] != '-'; i++){
         if(source[i] != '\n'){
             vec[q] = source[i];

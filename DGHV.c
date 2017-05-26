@@ -26,7 +26,7 @@ void encryptBit(mpz_t chiper, Param *param, PK *pk, int c){
 
     randomRange(rand, param->rhoM);
 
-    for(int i = subStart; i < subEnd; i++){
+    for(unsigned int i = subStart; i < subEnd; i++){
         mpz_add(sum, sum, pk->PK[i]);
     }
 

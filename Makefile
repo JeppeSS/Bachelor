@@ -1,40 +1,24 @@
-all: testKeyGen testSKWrite testSKRead testPKRead testPKWrite testWrongKey testPlaintext
+TARGET = testCrypto.o testSKWrite.o testSKRead.o testPKRead.o testPKWrite.o testWrongKey.o testPlaintext.o
+SRC = DGHV.c Filemanager.c random.c keyGen.c Plaintext.c
+CC = gcc
+CFLAGS = -std=c11 -Wall -Wextra -g 
+LIBS = -lm -lgmp -fopenmp $(mysql_config --cflags --libs)
 
-HEADERS = Database.h Plaintext.h Filemanager.h DGHV.h keyGen.h random.h
+$(info The Almanac program requires GMP version 6.1.2, see https://gmplib.org/)
+$(info )
 
-testKeyGen: testCrypto.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o testKeyGen.o DGHV.c Filemanager.c random.c keyGen.c testCrypto.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
 
-testPKWrite: testPKWrite.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o testPKWrite.o DGHV.c Filemanager.c random.c keyGen.c testPKWrite.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
+.PHONY: default all clean
 
-testSKWrite: testSKWrite.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o testSKWrite.o DGHV.c Filemanager.c random.c keyGen.c testSKWrite.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
+default: $(TARGET)
+all: $(TARGET)
 
-testSKRead: testSKRead.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o testSKRead.o DGHV.c Filemanager.c random.c keyGen.c testSKRead.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
+HEADERS = $(wildcard *.h)
 
-testPKRead: testPKRead.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o testPKRead.o DGHV.c Filemanager.c random.c keyGen.c testPKRead.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
+.PRECIOUS: $(TARGET) $(OBJECTS)
 
-testWrongKey: testWrongKey.c DGHV.c Filemanager.c random.c keyGen.c $(HEADERS)
-	gcc -Wall -std=c11 -o testWrongKey.o DGHV.c Filemanager.c random.c keyGen.c testWrongKey.c -lm -lgmp -fopenmp `mysql_config --cflags --libs`  
-
-testPlaintext: testPlaintext.c Plaintext.c $(HEADERS)
-	gcc -Wall -std=c11 -o testPlaintext.o testPlaintext.c Plaintext.c
+$(TARGET): %.o: %.c
+	$(CC) $< $(SRC) $(CFLAGS)$ $(LIBS)-o $@
 
 clean:
-	-rm -f testPKWrite.o
-	-rm -f testSKWrite.o
-	-rm -f testSKRead.o
-	-rm -f testPKRead.o
-	-rm -f testKeyGen.o
-	-rm -f testWrongKey.o
-	-rm -f testPlaintext.o
-	-rm -f testPKWrite
-	-rm -f testKeyGen
-	-rm -f testSKWrite
-	-rm -f testSKRead
-	-rm -f testPKRead
-	-rm -f testWrongKey
-	-rm -f testPlaintext
+	-rm -f *.o

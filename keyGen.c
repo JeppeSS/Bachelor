@@ -61,7 +61,7 @@ int pk_init(PK *pk, Param *param){
     }
 
     // Set all values in PK to 0
-    for(int i = 0; i < param->tau; i++){
+    for(unsigned int i = 0; i < param->tau; i++){
         mpz_init(pk->PK[i]);
     }
 
@@ -231,7 +231,7 @@ void genPK(PK *pk, SK *sk, Param *param){
     while(mpz_odd_p(res) || mpz_even_p(pk->PK[0])){
         #pragma omp parallel for 
         // Create sample for all integers in the public key vector
-        for(int i = 0; i < param->tau; i++){
+        for(unsigned int i = 0; i < param->tau; i++){
             pkSample(pk->PK[i], sk, param);
         }
 
@@ -245,7 +245,7 @@ void genPK(PK *pk, SK *sk, Param *param){
 
         mpz_set(tmp, pk->PK[0]);
 
-        for(int i = 0; i < param->tau; i++){
+        for(unsigned int i = 0; i < param->tau; i++){
             if(mpz_cmp(tmp, pk->PK[i]) < 0){
                 mpz_set(tmp, pk->PK[i]);
                 index = i;
@@ -316,7 +316,7 @@ void skClean(SK *sk){
 void pkClean(PK *pk, Param *param){
 
     // Set all PK values = 0, and free.
-    for(int i = 0; i < param->tau; i++){
+    for(unsigned int i = 0; i < param->tau; i++){
         mpz_set_ui(pk->PK[i], 0);
         mpz_clear(pk->PK[i]);
     }

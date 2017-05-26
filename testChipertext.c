@@ -3,32 +3,45 @@
 
 #include "keyGen.h"
 #include "DGHV.h"
+#include "random.h"
+#include "Filemanager.h"
 #include "Plaintext.h"
 #include "Chipertext.h"
 
+
 int main(void){
     Plaintext plain;
+    Plaintext plain2;
+    plaintext_init(&plain, "Hej");
+
     Chipertext chiper;
 
     Param param;
     SK sk;
     PK pk;
 
-    param_init(&param,8); 
+    param_init(&param, 8);
     keyGen(&sk, &pk, &param);
 
-
-    plaintext_init(&plain, "Hej med dig");
-
-    encrypt(&chiper, &param, &pk, &plain);
-
-
     for(unsigned int i = 0; i < plain.size; ++i){
-        gmp_printf("%Zx\n", chiper.chiper[i]);
+        printf("%d\n", plain.bin[i]);
     }
 
 
-    keyClean(&sk, &pk, &param);
+    printf("Encrypting msg: %s\n", plain.msg);
+
+    encrypt(&chiper, &param, &pk, &plain);
+    
+    decrypt(&plain2, &sk, &chiper);
+    
+    for(unsigned int i = 0; i < plain.size; ++i){
+        printf("%d\n", plain2.bin[i]);
+    }
+    
+
+    
+
+
     plaintext_clean(&plain);
 
 }

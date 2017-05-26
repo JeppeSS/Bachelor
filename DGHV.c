@@ -93,6 +93,51 @@ int decryptBit(SK *sk, mpz_t chiper){
 }
 
 
-void evaluate(mpz_t chiper, mpz_t chiper1, mpz_t chiper2){
+void evaluateBit(mpz_t chiper, mpz_t chiper1, mpz_t chiper2){
     mpz_add(chiper, chiper1, chiper2);
+}
+
+
+void evaluate(Chipertext *res, Chipertext *chiper1, Chipertext *chiper2){
+
+    if(chiper1->size != chiper2->size){
+        fprintf(stderr, "[ERROR] Not same size\n");
+    }
+
+    chipertext_init(res, chiper1->size);
+
+    for(unsigned int i = 0; i < chiper1->size; i++){
+        evaluateBit(res->chiper[i], chiper1->chiper[i], chiper2->chiper[i]);
+    }
+
+
+}
+
+
+int evaluateID(Chipertext *chiper1, Chipertext *chiper2, SK *sk){
+
+
+    if(chiper1->size != chiper2->size){
+        return EXIT_FAILURE;
+    }
+
+    mpz_t bit; 
+    mpz_init(bit);
+
+    int bits;
+
+    for(unsigned int i = 0; i < chiper1->size; i++){
+        evaluateBit(bit, chiper1->chiper[i], chiper2->chiper[i]);
+        bits = decryptBit(sk, bit);
+
+        if(bits == 1){
+            mpz_clear(bit);
+            return EXIT_FAILURE;
+        }
+    }
+    
+    mpz_clear(bit);
+
+    return EXIT_SUCCESS;
+
 }

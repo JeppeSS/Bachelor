@@ -1,4 +1,4 @@
-TARGET = testCrypto.o testSKWrite.o testSKRead.o testPKRead.o testPKWrite.o testWrongKey.o testPlaintext.o testChipertext.o
+TARGET = testCrypto.o testSKWrite.o testSKRead.o testPKRead.o testPKWrite.o testWrongKey.o testPlaintext.o testChipertext.o testEval.o testEvalText.o testEvalID.o
 
 SRC = DGHV.c Filemanager.c random.c keyGen.c Plaintext.c Chipertext.c
 CC = gcc

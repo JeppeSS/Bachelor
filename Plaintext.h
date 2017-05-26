@@ -8,7 +8,7 @@ struct Plaintext {
     char *msg;
 
     int *bin;
-    int size;
+    unsigned int size;
 
 };
 

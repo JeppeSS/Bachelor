@@ -35,6 +35,33 @@ int toBinary(Plaintext *plain){
     return EXIT_SUCCESS;
 }
 
+int fromBinary(Plaintext *plain){
+
+    int count = 0;
+    int val = 0;
+    int index = 0;
+    int r = 1;
+
+
+    for(unsigned int i = 0; i <= plain->size; ++i){
+        if(count == 8){
+            count = 0;
+            plain->msg[index] = val;
+            index++;
+            val = 0;
+            r = 1;
+        }
+
+
+        val += plain->bin[i] * r;
+        r *= 2;
+        count++;
+    }
+
+
+    return EXIT_SUCCESS;
+}
+
 
 int plaintext_clean(Plaintext *plain){
 
